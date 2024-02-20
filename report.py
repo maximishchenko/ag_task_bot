@@ -41,7 +41,7 @@ class Config(ABC):
     default_encoding = "utf-8"
     """ Кодировка файла конфигурации """
 
-    def __init__(self, config_file_path: str = "config.ini") -> None:
+    def __init__(self, config_file_path: str = "config/config.ini") -> None:
         self.config = configparser.ConfigParser()
         self.config.read(config_file_path, encoding=self.default_encoding)
 

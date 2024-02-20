@@ -2,5 +2,5 @@
 .mypy_cache/
 out/
 log/
-config.ini
+config/config.ini
 Pipfile.lock

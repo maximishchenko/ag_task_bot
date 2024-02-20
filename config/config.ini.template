@@ -1,0 +1,13 @@
+[Cobra]
+; IP-адрес или FQDN-имя узла сервера КПО Кобра
+host=http://XX.XX.XX.XX
+; Порт для подключения к КПО Кобра
+port=1234
+; Пароль удаленного доступа к REST API КПО Кобра
+token=1234567
+
+[Telegram]
+; Telegram Bot Token
+token=1234567890:ABCDEfg_hijklmNOpQRsTUVwxyzaBcDIFgH
+; ID группы в Telegram для направления общих уведомлений об очереди заявок
+chat_id=-1234567890
