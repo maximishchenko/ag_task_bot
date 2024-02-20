@@ -1,0 +1,6 @@
+**/__pycache__/
+.mypy_cache/
+out/
+log/
+config.ini
+Pipfile.lock
