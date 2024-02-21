@@ -11,3 +11,5 @@ token=1234567
 token=1234567890:ABCDEfg_hijklmNOpQRsTUVwxyzaBcDIFgH
 ; ID группы в Telegram для направления общих уведомлений об очереди заявок
 chat_id=-1234567890
+; ID чатов администраторов через запятую без пробела
+admin_chat_ids=123456789
