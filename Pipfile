@@ -8,6 +8,7 @@ requests = "*"
 openpyxl = "*"
 types-requests = "*"
 types-openpyxl = "*"
+aiogram = "==2.25.1"
 
 [dev-packages]
 mypy = "*"

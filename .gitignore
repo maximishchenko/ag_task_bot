@@ -2,5 +2,7 @@
 .mypy_cache/
 out/
 log/
+tmp/
 config/config.ini
 Pipfile.lock
+db.sqlite3
