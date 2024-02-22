@@ -5,6 +5,7 @@ from app.handlers.signup import register_handlers_signup
 from app.handlers.admin import register_handlers_admin
 from app.bot_global import bot, dp
 
+PYTHONDONTWRITEBYTECODE=1
 
 async def set_commands(bot: Bot):
     commands = [

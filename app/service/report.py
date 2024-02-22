@@ -61,7 +61,7 @@ class CobraTaskExcelReport(ExcelReport):
     def set_header(self):
         current_date = datetime.today().strftime("%d.%m.%Y")
         self._sheet.merge_cells('A1:I1')
-        self._sheet["A1"] = f"Оперативные заявки на {current_date}"
+        self._sheet["A1"] = f"Оперативные Заявки {current_date}"
         bold_font = Font(bold=True)
         self._sheet["A1"].font = (bold_font)
         self._sheet["A1"].alignment = Alignment(horizontal='center')
@@ -69,7 +69,7 @@ class CobraTaskExcelReport(ExcelReport):
     def set_footer(self):
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         self._sheet.merge_cells('A' + str(self.max_row + 1) + ':I'  + str(self.max_row + 1))
-        self._sheet["A" + str(self.max_row + 1)] = f"Дата генерации отчета: {current_datetime}"
+        self._sheet["A" + str(self.max_row + 1)] = f"Дата формирования отчета: {current_datetime}"
 
 
     def set_row(self, task: dict):

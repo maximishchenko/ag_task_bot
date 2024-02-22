@@ -9,6 +9,7 @@ openpyxl = "*"
 types-requests = "*"
 types-openpyxl = "*"
 aiogram = "==2.25.1"
+aiocron = "*"
 
 [dev-packages]
 mypy = "*"

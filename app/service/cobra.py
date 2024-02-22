@@ -109,7 +109,7 @@ class CobraTaskReportMessage:
     def add_report_header(self) -> None:
         """Добавляет заголовок к сообщению отчета"""
         current_date = datetime.today().strftime("%d.%m.%Y")
-        self.message += f"<b>Оперативные заявки на {current_date}</b>"
+        self.message += f"<b>Оперативные Заявки {current_date}</b>"
         self.add_empty_string_to_report_message()
         self.add_empty_string_to_report_message()
 
@@ -119,7 +119,7 @@ class CobraTaskReportMessage:
         Args:
             tehn (str): Ф.И.О. техника, закрепленного за заявкой из КПО Кобра
         """
-        self.message += f"<i>{str(tehn)}</i>"
+        self.message += f"<b>{str(tehn)}</b>"
         self.add_empty_string_to_report_message()
         self.add_empty_string_to_report_message()
 
@@ -131,7 +131,7 @@ class CobraTaskReportMessage:
             task (dict): словарь содержащий данные одной заявки, полученный из
             КПО Кобра
         """
-        task_string = f"{task['numobj']} {task['nameobj']} {task['addrobj']}\r\n{task['zay']}"
+        task_string = f"{task['n_abs']}\r\n{task['numobj']} {task['nameobj']} {task['addrobj']}\r\n{task['zay']}"
         self.message += str(task_string)
         self.add_empty_string_to_report_message()
         self.message += f"<ins>Заявку принял: {task['prin']} {task['timez']}</ins>"
@@ -144,7 +144,7 @@ class CobraTaskReportMessage:
     def add_generation_datetime(self) -> None:
         self.add_empty_string_to_report_message()
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-        self.message += f"<ins>Дата генерации отчета: {current_datetime}</ins>"
+        self.message += f"<ins>Дата формирования отчета: {current_datetime}</ins>"
 
     def get_report_message_text(self) -> str:
         """Возвращает сгенерированную строку сообщения отчета

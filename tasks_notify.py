@@ -1,58 +1,14 @@
-import requests
 from app.service.config import CobraConfig, TelegramConfig
 from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
 from app.service.report import CobraTaskExcelReport
-import logging
 import shutil
 from itertools import groupby
+from app.bot_global import bot
+import asyncio
 
 PYTHONDONTWRITEBYTECODE=1
 
-logger = logging.getLogger(__name__)
-
-# TODO Отказаться от класса Telegram в пользу встроенных методов aiogram
-
-class Telegram:
-    """Отправка информации в Telegram"""
-
-    base_url = "https://api.telegram.org/bot"
-    """ Базовый URL Telegram Bot API для направления запросов """
-
-    text_message_endpoint = "/sendMessage"
-    """ Метод REST API Telegram Bot API для отправки текстовых сообщений """
-
-    document_attachment_endpoint = "/sendDocument"
-    """ Метод REST API Telegram Bot API для отправки файлов """
-
-    def __init__(self, config: TelegramConfig) -> None:
-        self._token = config.get_token()
-        self._chat_id = config.get_chat_id()
-
-    def send_text_message(self, text: str) -> None:
-        """Отправка текстового сообщения
-
-        Args:
-            text (str): текст отправляемого сообщения
-        """
-        url = f"{self.base_url}{self._token}{self.text_message_endpoint}"
-        params = {"chat_id": self._chat_id, "text": text, "parse_mode": "HTML"}
-        requests.get(url=url, params=params)
-
-    def send_document_attachment(self, document_path: str) -> None:
-        """Отправка документа
-
-        Args:
-            document_path (str): путь к отправляемому документу
-        """
-        files = {"document": open(document_path, "rb")}
-        url = f"{self.base_url}{self._token}{self.document_attachment_endpoint}"
-        data = {
-            "chat_id": self._chat_id,
-        }
-        requests.post(url=url, data=data, files=files)
-
-
-def main():
+async def send_tasks():
     # Запрос заявок из КПО Кобра
     cobra_config = CobraConfig()
     cobra_base = CobraTaskReport(cobra_config)
@@ -76,12 +32,9 @@ def main():
         report_message.add_generation_datetime()
 
         # Отправка уведомлений Telegram
-        tg_config = TelegramConfig()
-        tg = Telegram(tg_config)
-        tg.send_text_message(report_message.get_report_message_text())
-        tg.send_document_attachment(task_report.export_filename)
-    else:
-        logger.info("Заявки отсутствуют")
+        tg_config = TelegramConfig()        
+        await bot.send_message(tg_config.get_chat_id(), report_message.get_report_message_text(), parse_mode='html')
+        await bot.send_document(tg_config.get_chat_id(), open(task_report.export_filename, 'rb'))
 
     # Очистка каталог экспорта отчетов
     shutil.rmtree(
@@ -91,4 +44,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(send_tasks())
