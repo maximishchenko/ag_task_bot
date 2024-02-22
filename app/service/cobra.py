@@ -73,7 +73,13 @@ class CobraTaskReport(CobraTable):
     def get_tasks(self) -> tuple:
         """Получает заявки из КПО Кобра"""
         response = self._get_unfinished_tasks()
-        return tuple(response)
+        tasks_list = []
+        current_date = datetime.now() #.strftime("%d.%m.%Y %H:%M:%S")
+        for task in response:
+            timev = datetime.strptime(task['timev'], "%d.%m.%Y %H:%M:%S")
+            if current_date >= timev:
+                tasks_list.append[task]
+        return tuple(tasks_list)
 
     def _get_unfinished_tasks(self):
         """Запрос текущих заявок из КПО Кобра"""
@@ -121,7 +127,6 @@ class CobraTaskReportMessage:
         """
         self.message += f"<b>{str(tehn)}</b>"
         self.add_empty_string_to_report_message()
-        self.add_empty_string_to_report_message()
 
     def add_task_to_report_message(self, task: dict) -> None:
         """Добавление данных одной заявки, полученной из КПО Кобра,
@@ -131,7 +136,7 @@ class CobraTaskReportMessage:
             task (dict): словарь содержащий данные одной заявки, полученный из
             КПО Кобра
         """
-        task_string = f"{task['n_abs']}\r\n{task['numobj']} {task['nameobj']} {task['addrobj']}\r\n{task['zay']}"
+        task_string = f"{task['n_abs']}\r\n{task['numobj']} {task['nameobj']} {task['addrobj']}\r\n<code>{task['zay']}</code>"
         self.message += str(task_string)
         self.add_empty_string_to_report_message()
         self.message += f"<ins>Заявку принял: {task['prin']} {task['timez']}</ins>"
