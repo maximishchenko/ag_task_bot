@@ -36,6 +36,11 @@ async def send_tasks():
         await bot.send_message(tg_config.get_chat_id(), report_message.get_report_message_text(), parse_mode='html')
         await bot.send_document(tg_config.get_chat_id(), open(task_report.export_filename, 'rb'))
 
+        if tg_config.get_debug_chat_id():
+            await bot.send_message(tg_config.get_debug_chat_id(), report_message.get_report_message_text(), parse_mode='html')
+            await bot.send_document(tg_config.get_debug_chat_id(), open(task_report.export_filename, 'rb'))
+
+
     # Очистка каталог экспорта отчетов
     shutil.rmtree(
         CobraTaskExcelReport.export_path,
