@@ -1,72 +1,64 @@
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher, types
-from app.bot_global import tg_config, bot, dp, db_file
-from app.service.db import User
-from app.service.status import Status, StatusAction
+from app.bot_global import db_file, cobra_config
+from app.service.db import User, OneUser
+from app.service.status import Status
+from app.service.cobra import CobraTehn
+from app.service.config import CobraConfig
+from app.service.dialog import Signup
+from app.service.db import MobileAppAccount
+from aiogram.dispatcher.filters import ChatTypeFilter
 
 user = User(db_file)
+cobra_config = CobraConfig()
+cobra_account = CobraTehn(cobra_config)
 
-def get_user_states_keyboard(admin_chat_id: str, user_chat_id: str):
-    """ Генерация кнопок для подтверждения регистрации пользователя 
-    администратором """
-    buttons = [
-        [
-            types.InlineKeyboardButton(text="Активировать", callback_data=f"{StatusAction.act_enable_user}|{admin_chat_id}|{user_chat_id}"),
-            types.InlineKeyboardButton(text="Заблокировать", callback_data=f"{StatusAction.act_disable_user}|{admin_chat_id}|{user_chat_id}")
-        ],
-    ]
-    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
-    return keyboard
+signup_state = Signup()
 
 async def cmd_signup(message: types.Message, state: FSMContext):
-    """ Обработчик команды регистрации пользователя.
-    Направляет всем администраторам уведомление о регистрации пользователя
-    Предлагает набор кнопок для активации или блокировки пользователя """
+    """ Обработчик команды регистрации пользователя """
+    await state.finish()
     if user.is_user_exists(message.from_user.id):
-        await message.answer("Вы уже зарегистрированы, обратитесь к администратору для активации")
+        await message.answer("Вы уже зарегистрированы. Регистрация не требуется")
+        await state.finish()
         return
+    await message.answer('Введите имя пользователя от приложения \"Мобильный техник\"')
+    await Signup.wating_username.set()
 
-    user.add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username, Status.inactive)
+async def get_username(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data[signup_state.username_param] = message.text
+    await message.answer('Введите пароль приложения \"Мобильный техник\"')
+    await Signup.waiting_password.set()
+    return
 
-    admin_notify_message = f"Зарегистрирован новый пользователь: {message.from_user.username}. Разрешить ему взаимодействие с ботом?"
-    
-    admin_chat_ids = tg_config.get_admin_chat_ids()
-    for admin in admin_chat_ids:
-        keyboard = get_user_states_keyboard(admin, message.from_user.id)
-        await bot.send_message(admin, admin_notify_message, reply_markup=keyboard)
-    
-    await message.answer("Запрос регистрации отправлен администратору, дождитесь уведомления о подтверждении регистрации")
-
-
-@dp.callback_query_handler(lambda command: command.data and command.data.startswith('act_'))
-async def process_user(callback_query: types.CallbackQuery):
-    """ Обработка действий администратора для подтверждения регистрации 
-    пользователя """
-    params = callback_query.data.split("|")
-    action = params[0]
-    admin_chat_id = params[1]
-    user_chat_id = params[2]
-    if not user.is_user_exists(user_chat_id):
-        msg = f"Пользователь с ID чата {user_chat_id} отсутствует в БД и к нему невозможно применить данное действие. Возможно пользователь был удален"
-        await bot.send_message(admin_chat_id, msg)
-        return
-    if action == StatusAction.act_enable_user:
-        admin_reply_message = "Вы подтвердили запрос. Теперь пользователь может получить доступ к функциям бота"
-        user_reply_message = "Администратор подтвердил ваш запрос. Теперь вы можете получить доступ к функциям бота"
-        status = Status.active
-    elif action == StatusAction.act_disable_user:
-        admin_reply_message = "Вы отклонили запрос. Теперь пользователь не может получить доступ к функциям бота"
-        user_reply_message = "Администратор отклонил ваш запрос. Теперь вы не можете получить доступ к функциям бота"
-        status = Status.inactive
+async def get_password(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    username = user_data[signup_state.username_param]
+    password = message.text
+    account = MobileAppAccount(username=username, password=password)
+    one_user = OneUser(chat_id=message.from_user.id, first_name=message.from_user.first_name, last_name=message.from_user.last_name, username=message.from_user.username, status=Status.active, tehn=username)
+    if cobra_account.is_account_valid(account):
+        user.add_user(one_user)
+        await message.answer("Вы успешно зарегистрированы. Теперь вы можете получить доступ к функциям бота")
     else:
-        await bot.send_message(admin_chat_id, "Передано неизвестное событие. Указанная команда не может быть выполнена")
-        return
-    user.change_status(user_chat_id, status)
-    # TODO связать с техником
-    await bot.send_message(admin_chat_id, admin_reply_message)
-    await bot.send_message(user_chat_id, user_reply_message)
+        await message.answer("Неверное имя пользователя или пароль. Пользователь не зарегистрирован. Если вы ошиблись при вводе данных - пройдите регистрацию заново")
+    await state.finish()
+    return
+
 
 def register_handlers_signup(dp: Dispatcher):
     dp.register_message_handler(cmd_signup, commands="signup", state="*")
+    dp.register_message_handler(
+        get_username,
+        ChatTypeFilter(chat_type=[types.ChatType.PRIVATE]),
+        state=Signup.wating_username,
+    )
+    dp.register_message_handler(
+        get_password,
+        ChatTypeFilter(chat_type=[types.ChatType.PRIVATE]),
+        state=Signup.waiting_password,
+    )
+
 
     

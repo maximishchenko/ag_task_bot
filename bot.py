@@ -9,7 +9,7 @@ PYTHONDONTWRITEBYTECODE=1
 
 async def set_commands(bot: Bot):
     commands = [
-        BotCommand(command="/singup", description="Регистрация"),
+        BotCommand(command="/signup", description="Регистрация"),
         BotCommand(command="/admin", description="Меню администратора"),
         BotCommand(command="/cancel", description="Сброс состояния диалога"),
     ]

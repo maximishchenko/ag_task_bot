@@ -3,17 +3,7 @@ from datetime import datetime
 from app.service.config import CobraConfig
 import requests
 import urllib.request, urllib.parse
-
-
-
-# Заявки
-# № заявки n_abs
-# дата поступления timez
-# наименование объекта nameobj
-# номер объекта numobj
-# адрес объекта addrobj
-# техник tehn
-# назначенное время timev
+from app.service.db import MobileAppAccount, CobraOneLkUser
 
 
 class CobraTaskReportHeader:
@@ -24,7 +14,6 @@ class CobraTaskReportHeader:
     zay = "Дефект"
     timez = "Дата поступления"
     prin = "Заявку принял"
-    # account_number = "Пультовый номер"
     nameobj = "Наименование объекта"
     numobj = "Пультовой номер"
     addrobj = "Адрес объекта"
@@ -162,3 +151,31 @@ class CobraTaskReportMessage:
             str: строка сообщения отчета
         """
         return self.message
+    
+
+class CobraTehn(CobraTable):
+
+    table_name = "lkuser"
+    """ Название таблицы, хранящей данные техников """
+
+    def is_account_valid(self, account: MobileAppAccount) -> bool:
+        lk_users = self._get_tehn_list()
+        for tehn in lk_users:
+            lk_user = CobraOneLkUser(n_abs=tehn['n_abs'], name=tehn['fio'], status=tehn['status'], password=tehn['pass'])
+            if account.username == lk_user.name and account.password == lk_user.password:
+                return True
+        return False
+    
+    def _get_tehn_list(self):
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "fields": self._get_fields(),
+        }
+        response = requests.get(url=url, params=params).json()
+        result = sorted(response["result"], key=lambda task: task["fio"])
+        return result
+
+    def _get_fields(self) -> str:
+        fields_value = '[{"fio": 1}, {"n_abs": 1}, {"status": 1}, {"pass": 1}]'
+        return f"{fields_value}"

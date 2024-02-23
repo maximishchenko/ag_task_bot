@@ -1,4 +1,30 @@
 import sqlite3
+from dataclasses import dataclass
+from typing import Union
+        
+
+@dataclass
+class CobraOneLkUser:
+    n_abs: int
+    name: str
+    status: int
+    password: str = None
+
+
+@dataclass
+class OneUser:
+    chat_id: int
+    first_name: str
+    last_name: str|None
+    username: str|None
+    status: int = 0
+    tehn: str = None
+
+
+@dataclass
+class MobileAppAccount:
+    username: str
+    password: str
 
 
 class DB:
@@ -10,36 +36,28 @@ class DB:
 
 class User(DB):
     
-    def add_user(self, chat_id: int, first_name: str, last_name: str = None, username: str = None, status: int = 0):
+    def add_user(self, user: OneUser):
         with self._connection:
-            return self._cursor.execute("INSERT INTO `user` (`chat_id`, `first_name`, `last_name`, `username`, `status`) VALUES (?, ?, ?, ?, ?)", (chat_id, first_name, last_name, username, status))
+            params = (user.chat_id, user.first_name, user.last_name, user.username, user.status, user.tehn)
+            query_str = "INSERT INTO `user` (`chat_id`, `first_name`, `last_name`, `username`, `status`, `tehn`) VALUES (?, ?, ?, ?, ?, ?)"
+            return self._cursor.execute(query_str, params)
+        
+    def get_user(self, chat_id: int) -> OneUser:
+        with self._connection:
+            params = (chat_id, )
+            query_str = "SELECT * FROM `user` WHERE `chat_id` = ? "
+            result = self._cursor.execute(query_str, params).fetchall()
+            print(result)
+            if len(result):
+                return OneUser(chat_id=result[0][1], first_name=result[0][2], last_name=result[0][2], username=result[0][3], status=result[0][4], tehn=result[0][5])
+            return None
 
     def is_user_exists(self, chat_id: int):
-        with self._connection:
-            result = self._cursor.execute("SELECT * FROM `user` WHERE `chat_id` = ? ", (chat_id, )).fetchall()
-            return bool(len(result))
+        result = self.get_user(chat_id)
+        return True if result else False
         
-    def change_status(self, chat_id: int, status: int):
+    def change_status(self, user: OneUser):
         with self._connection:
-            return self._cursor.execute("UPDATE `user` SET `status` = ? WHERE `chat_id` = ?", (status, chat_id))
-        
-
-class CobraLkUser(DB):
-
-    def add_user(self, name: str, n_abs: int) -> None:
-        with self._connection:
-            return self._cursor.execute("INSERT INTO `cobra_lkuser` (`name`, `n_abs`) VALUES (?, ?)", (name, n_abs))
-
-    def delete_user(self, n_abs: int) -> None:
-        with self._connection:
-            return self._cursor.execute("DELETE FROM `cobra_lkuser` WHERE `n_abs` = ?", (n_abs))
-
-    def is_user_exists(self, name: str, n_abs: int) -> bool:
-        with self._connection:
-            result = self._cursor.execute("SELECT * FROM `cobra_lkuser` WHERE `name` = ? AND `n_abs` = ? ", (name, n_abs, )).fetchall()
-            return bool(len(result))
-
-    def get_users(self) -> tuple:
-        with self._connection:
-            result = self._cursor.execute("SELECT * FROM `cobra_lkuser`").fetchall()
-            return result
+            params = (user.status, user.chat_id)
+            query_str = "UPDATE `user` SET `status` = ? WHERE `chat_id` = ?"
+            return self._cursor.execute(query_str, params)
