@@ -30,13 +30,13 @@ pipenv install
 * Скопировать шаблон конфигурации
 
 ```
-cp config/config.ini.template config/config.ini
+cp template/config/config.ini.template config/config.ini
 ```
 
 * Указать парметры подключения к КПО Кобра и Telegram Bot API
 
-### Запуск
+### Запуск вручную
 
 ```
-python report.py
+python tasks_notify.py
 ```
