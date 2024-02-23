@@ -53,7 +53,7 @@ class TelegramConfig(Config):
     chat_id_param = "chat_id"
     """ Имя параметра, хранящего данные с ID чата в Telegram """
 
-    debug_chat_id = "debug_chat_id"
+    debug_chat_id_param = "debug_chat_id"
 
     admin_chat_ids_param = 'admin_chat_ids'
     """ Имя параметра, хранящего данные ID чатов администраторов в Telegram """
