@@ -4,3 +4,4 @@ out/
 log/
 config.ini
 Pipfile.lock
+db.sqlite3
