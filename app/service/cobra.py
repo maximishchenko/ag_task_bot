@@ -73,7 +73,7 @@ class CobraTaskReport(CobraTable):
     def get_tasks(self) -> tuple:
         """Получает заявки из КПО Кобра"""
         response = self._get_unfinished_tasks()
-        # return tuple(response)
+        # return tuple()
         tasks_list = list()
         current_date = datetime.today().date()
         for task in response:

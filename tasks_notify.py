@@ -13,6 +13,7 @@ async def send_tasks():
     cobra_config = CobraConfig()
     cobra_base = CobraTaskReport(cobra_config)
     task_objects = cobra_base.get_tasks()
+    tg_config = TelegramConfig()        
     if len(task_objects):
         # Генерация файла отчета и текста сообщения в Telegram
         task_report = CobraTaskExcelReport()
@@ -32,10 +33,12 @@ async def send_tasks():
         report_message.add_generation_datetime()
 
         # Отправка уведомлений Telegram
-        tg_config = TelegramConfig()        
         for chat in tg_config.get_task_full_report_chat_ids():
             await bot.send_message(chat, report_message.get_report_message_text(), parse_mode='html')
             await bot.send_document(chat, open(task_report.export_filename, 'rb'))
+    else:
+        for chat in tg_config.get_task_full_report_chat_ids():
+            await bot.send_message(chat, "Заявки на текущую дату отсутствуют", parse_mode='html')
 
 
     # Очистка каталог экспорта отчетов
