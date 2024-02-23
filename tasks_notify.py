@@ -33,12 +33,9 @@ async def send_tasks():
 
         # Отправка уведомлений Telegram
         tg_config = TelegramConfig()        
-        await bot.send_message(tg_config.get_chat_id(), report_message.get_report_message_text(), parse_mode='html')
-        await bot.send_document(tg_config.get_chat_id(), open(task_report.export_filename, 'rb'))
-
-        if tg_config.get_debug_chat_id():
-            await bot.send_message(tg_config.get_debug_chat_id(), report_message.get_report_message_text(), parse_mode='html')
-            await bot.send_document(tg_config.get_debug_chat_id(), open(task_report.export_filename, 'rb'))
+        for chat in tg_config.get_task_full_report_chat_ids():
+            await bot.send_message(chat, report_message.get_report_message_text(), parse_mode='html')
+            await bot.send_document(chat, open(task_report.export_filename, 'rb'))
 
 
     # Очистка каталог экспорта отчетов

@@ -79,7 +79,6 @@ class CobraTaskReport(CobraTable):
         for task in response:
             timev = datetime.strptime(task['timev'], "%d.%m.%Y %H:%M:%S").date()
             if current_date >= timev:
-                print(task)
                 tasks_list.append(task)
         return tuple(tasks_list)
 

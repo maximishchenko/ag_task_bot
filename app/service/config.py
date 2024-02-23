@@ -50,10 +50,8 @@ class TelegramConfig(Config):
     token_param = "token"
     """ Имя параметра, хранящего данные токена бота """
 
-    chat_id_param = "chat_id"
+    task_full_report_chat_ids = "task_full_report_chat_ids"
     """ Имя параметра, хранящего данные с ID чата в Telegram """
-
-    debug_chat_id_param = "debug_chat_id"
 
     admin_chat_ids_param = 'admin_chat_ids'
     """ Имя параметра, хранящего данные ID чатов администраторов в Telegram """
@@ -62,12 +60,10 @@ class TelegramConfig(Config):
         """Возвращает токен бота Telegram"""
         return self.config.get(self.section, self.token_param)
 
-    def get_chat_id(self) -> str:
+    def get_task_full_report_chat_ids(self) -> tuple:
         """Возвращает ID чата в Telegram для отправки уведомлений"""
-        return self.config.get(self.section, self.chat_id_param)
-    
-    def get_debug_chat_id(self) -> str:
-        return self.config.get(self.section, self.debug_chat_id_param)
+        chat_ids = self.config.get(self.section, self.task_full_report_chat_ids)
+        return tuple(chat_ids.split(','))
     
     def get_admin_chat_ids(self) -> tuple:
         """ Возвращает ID чатов администраторов бота в Telegram
