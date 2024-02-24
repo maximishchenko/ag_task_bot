@@ -18,6 +18,11 @@ signup_state = Signup()
 async def cmd_signup(message: types.Message, state: FSMContext):
     """ Обработчик команды регистрации пользователя """
     await state.finish()
+    if message.chat.type != types.ChatType.PRIVATE:
+        await message.answer("Регастрация не доступна в группе. \
+Регистрация возможна только в прямом диалоге с ботом")
+        await state.finish()
+        return
     if user.is_user_exists(message.from_user.id):
         await message.answer("Вы уже зарегистрированы. Регистрация не требуется")
         await state.finish()
