@@ -1,11 +1,14 @@
-from tasks_notify import send_tasks
+from tasks_notify import send_all_tasks
 import asyncio
 import aiocron
+from app.bot_global import tg_config
 
 
 async def main():
-    send_tasks_to_chat = aiocron.crontab("36 16 * * *", func=send_tasks, args=(), start=True)
-    # cron_sender_third = aiocron.crontab("00 16 * * *", func=sender, args=(), start=True)
+    task_full_report_time = tg_config.get_task_full_report_shedule_time()
+    task_full_report_min = task_full_report_time[1]
+    task_full_report_hour = task_full_report_time[0]
+    send_tasks_to_chat = aiocron.crontab(f"{task_full_report_min} {task_full_report_hour} * * *", func=send_all_tasks, args=(), start=True)
 
     while True:
         await asyncio.sleep(1)
