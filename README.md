@@ -43,6 +43,14 @@ cp template/db.sqlite3 db.sqlite3
 
 ### Запуск вручную
 
+* Запуск рассылки уведомлений о заявках на текущую дату
+
 ```
 python tasks_notify.py
+```
+
+* Запуск бота
+
+```
+python bot.py
 ```
