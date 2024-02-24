@@ -31,6 +31,12 @@ pipenv install
 
 ```
 cp template/config/config.ini.template config/config.ini
+cp template/config/log.ini.template config/log.ini
+```
+
+* Скопировать шаблон базы данных
+```
+cp template/db.sqlite3 db.sqlite3
 ```
 
 * Указать парметры подключения к КПО Кобра и Telegram Bot API
