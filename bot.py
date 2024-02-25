@@ -11,6 +11,7 @@ async def set_commands(bot: Bot):
     commands = [
         BotCommand(command="/signup", description="Регистрация"),
         BotCommand(command="/tasks", description="Генерация списка заявок"),
+        BotCommand(command="/my_tasks", description="Мои заявки"),
         BotCommand(command="/cancel", description="Сброс состояния диалога"),
     ]
     await bot.set_my_commands(commands)

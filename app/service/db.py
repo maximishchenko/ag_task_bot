@@ -47,9 +47,9 @@ class User(DB):
             params = (chat_id, )
             query_str = "SELECT * FROM `user` WHERE `chat_id` = ? "
             result = self._cursor.execute(query_str, params).fetchall()
-            print(result)
             if len(result):
-                return OneUser(chat_id=result[0][1], first_name=result[0][2], last_name=result[0][2], username=result[0][3], status=result[0][4], tehn=result[0][5])
+                user = OneUser(chat_id=result[0][1], first_name=result[0][2], last_name=result[0][3], username=result[0][4], status=result[0][5], tehn=result[0][6])
+                return user
             return None
         
     def get_user_by_tehn(self, tehn: str):
@@ -58,7 +58,7 @@ class User(DB):
             query_str = "SELECT * FROM `user` WHERE `tehn` = ? "
             result = self._cursor.execute(query_str, params).fetchall()
             if len(result):
-                return OneUser(chat_id=result[0][1], first_name=result[0][2], last_name=result[0][2], username=result[0][3], status=result[0][4], tehn=result[0][5])
+                return OneUser(chat_id=result[0][1], first_name=result[0][2], last_name=result[0][3], username=result[0][4], status=result[0][5], tehn=result[0][6])
             return None
 
     def is_user_exists(self, chat_id: int):

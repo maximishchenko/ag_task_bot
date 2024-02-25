@@ -11,3 +11,9 @@ class Signup(StatesGroup):
 
     username_param = 'username'
     password_param = 'password'
+
+
+class MyTask(StatesGroup):
+
+    waiting_input_date = State()
+    waiting_input_time = State()

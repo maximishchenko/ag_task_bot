@@ -46,11 +46,7 @@ class CobraTable(ABC):
 
 class CobraTaskReport(CobraTable):
     """Реализует запрос к REST API КПО Кобра, формирует параметры запроса
-    (фильтр, набор возвращаемых полей)
-
-    TODO генерировать набор возвращаемых полей из объекта передачи данных,
-    хранящего названия заголовков таблицы отчета
-    """
+    (фильтр, набор возвращаемых полей) """
 
     name_template = "***"
     """ Шаблон наименования заявки. В отчет попадают только заявки, формируемые
@@ -69,6 +65,24 @@ class CobraTaskReport(CobraTable):
             if current_date >= timev:
                 tasks_list.append(task)
         return tuple(tasks_list)
+    
+    def get_my_tasks(self, name: str) -> tuple:
+        response = self._get_unfinished_tasks()
+        tasks_list = []
+        for task in response:
+            if task['tehn'] == name:
+                tasks_list.append(task)
+        return tuple(tasks_list)
+    
+    def get_one_task(self, n_abs: str) -> tuple:
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "filter": '[{"n_abs": "' + n_abs + '"}]',
+            "fields": self._get_fields(),
+        }
+        response = requests.get(url=url, params=params).json()
+        return response["result"][0],
 
     def _get_unfinished_tasks(self):
         """Запрос текущих заявок из КПО Кобра"""

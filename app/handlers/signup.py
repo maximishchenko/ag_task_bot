@@ -5,7 +5,7 @@ from app.service.db import User, OneUser
 from app.service.status import Status
 from app.service.cobra import CobraTehn
 from app.service.config import CobraConfig
-from app.service.dialog import Signup
+from app.handlers.state import Signup
 from app.service.db import MobileAppAccount
 from aiogram.dispatcher.filters import ChatTypeFilter
 
