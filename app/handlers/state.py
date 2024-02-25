@@ -17,3 +17,7 @@ class MyTask(StatesGroup):
 
     waiting_input_date = State()
     waiting_input_time = State()
+
+    task_id_param = 'task_id'
+    task_new_date_param = 'task_date'
+    task_new_time_param = 'task_time'
