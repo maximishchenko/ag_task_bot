@@ -8,12 +8,11 @@ import asyncio
 
 PYTHONDONTWRITEBYTECODE=1
 
-user = User(db_file)
-cobra_base = CobraTaskReport(cobra_config)
-task_objects = cobra_base.get_tasks()
-
 
 async def send_all_tasks():
+    user = User(db_file)
+    cobra_base = CobraTaskReport(cobra_config)
+    task_objects = cobra_base.get_tasks()
     # Запрос заявок из КПО Кобра 
     if len(task_objects):
         # Генерация файла отчета и текста сообщения в Telegram
@@ -51,7 +50,10 @@ async def send_all_tasks():
     )
 
 
-async def send_personal_tasks():     
+async def send_personal_tasks(): 
+    user = User(db_file)
+    cobra_base = CobraTaskReport(cobra_config)
+    task_objects = cobra_base.get_tasks()    
     if len(task_objects):
         # Генерация файла отчета и текста сообщения в Telegram
         for tehn, one_tehn_tasks in groupby(

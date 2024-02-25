@@ -57,6 +57,10 @@ class TelegramConfig(Config):
     """ Имя параметра, хранящего данные ID чатов администраторов в Telegram """
 
     task_full_report_time = 'task_full_report_time'
+    """ Имя параметра, хранящего время запуска генерации отчета для отправки в группу """
+
+    task_personal_report_time = 'task_personal_report_time'
+    """ Имя параметра, хранящего время запуска генерации отчета для отправки перснальных уведомлений """
 
     def get_token(self) -> str:
         """Возвращает токен бота Telegram"""
@@ -68,7 +72,12 @@ class TelegramConfig(Config):
         return tuple(chat_ids.split(','))
     
     def get_task_full_report_shedule_time(self) -> tuple:
+        """ Возвращает время запуска генерации отчета для отправки в группу """
         return tuple(self.config.get(self.section, self.task_full_report_time).split(":"))
+    
+    def get_task_personal_report_shedule_time(self) -> tuple:
+        """ Возвращает время запуска генерации отчета для отправки персональных уведомлений """
+        return tuple(self.config.get(self.section, self.task_personal_report_time).split(":"))
     
     def get_admin_chat_ids(self) -> tuple:
         """ Возвращает ID чатов администраторов бота в Telegram
