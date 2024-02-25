@@ -202,7 +202,6 @@ async def change_task_date_actions(callback: types.CallbackQuery, state: FSMCont
         data[MyTask.task_id_param] = cobra_task_id
     await callback.message.answer('Выберите дату переноса заявки: ', reply_markup=markup)
 
-
 @dp.callback_query_handler(Datepicker.datepicker_callback.filter())
 async def process_datepicker(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
     """ Обрабатывает выбор даты в календаре

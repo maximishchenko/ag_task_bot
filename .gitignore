@@ -1,11 +1,5 @@
 **/__pycache__/
 .mypy_cache/
 out/
-log/
-tmp/
-config/config.ini
-config/log.ini
 Pipfile.lock
 db.sqlite3
-job/states.json
-!template/db.sqlite3
