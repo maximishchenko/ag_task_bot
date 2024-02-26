@@ -166,9 +166,9 @@ async def task_actions(callback: types.CallbackQuery):
             types.InlineKeyboardButton(text="Просмотр заявки", callback_data=f"view_action|{cobra_task_id}|{chat_id}"),
             types.InlineKeyboardButton(text="Перенос заявки", callback_data=f"change_date_action|{cobra_task_id}|{chat_id}"),
          ],
-         [
-            types.InlineKeyboardButton(text="Закрыть заявку", callback_data=f"close_action|{cobra_task_id}|{chat_id}"),
-         ]
+        #  [
+        #     types.InlineKeyboardButton(text="Закрыть заявку", callback_data=f"close_action|{cobra_task_id}|{chat_id}"),
+        #  ]
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
     await bot.send_message(chat_id, f"Вы выбрали задачу {cobra_task_id}. Выберите действие:", reply_markup=my_actions_kb)

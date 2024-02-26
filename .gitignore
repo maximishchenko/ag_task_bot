@@ -1,5 +1,4 @@
 **/__pycache__/
 .mypy_cache/
 out/
-Pipfile.lock
 db.sqlite3
