@@ -21,7 +21,6 @@ class CobraTaskReportHeader:
     timev = "Назначенное время"
 
 
-
 class CobraTable(ABC):
     """Базовый класс для получения данных из таблиц КПО Кобра"""
 

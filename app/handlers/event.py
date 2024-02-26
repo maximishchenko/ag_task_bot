@@ -104,12 +104,15 @@ async def cmd_tasks_notifications(message: types.Message, state: FSMContext):
         state (FSMContext): состояние диалога
     """
     pre_msg = "Запуск генерации списка заявок. Пожалуйста ожидайте"
+    loop = asyncio.get_event_loop()
     if is_private_chat(message):
         await message.answer(pre_msg)
-        await send_personal_tasks()
+        # await send_personal_tasks()
+        loop.run_until_complete(send_personal_tasks())
     elif is_group_or_supergroup(message):
         await message.answer(pre_msg)
-        await send_all_tasks()
+        # await send_all_tasks()
+        loop.run_until_complete(send_all_tasks())
     else:
         logger.warning("Генерация отчета запрошена пользователем, \
                        не состоящим в группе и не прошедшим регистрацию")
