@@ -107,6 +107,20 @@ class CobraTaskReport(CobraTable):
         return f"{fields_value}"
 
 
+class CobraTaskEdit(CobraTaskReport):
+
+    endpoint_root = 'api.table.edit'
+    
+    def update_one_task_time(self, n_abs: int, event_time: str):
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+            "fields": '[{"timev":"' + event_time + '"}]',
+        }
+        response = requests.get(url=url, params=params).json()
+
+
 class CobraTaskReportMessage:
     """Генерация текста сообщения отчета на основании данных
     заявки из КПО Кобра"""

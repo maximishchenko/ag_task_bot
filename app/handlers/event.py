@@ -7,12 +7,12 @@ from app.bot_global import db_file, cobra_config, dp, bot
 from app.service.db import User
 from app.bot_global import logger
 from app.handlers.state import MyTask
-from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
+from app.service.cobra import CobraTaskReport, CobraTaskReportMessage, CobraTaskEdit
 from aiogram_datepicker import Datepicker, DatepickerSettings
 from datetime import datetime
 from aiogram.types import Message, CallbackQuery
 from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
-import asyncio
+# import asyncio
 
 tg_config = TelegramConfig()     
 
@@ -105,15 +105,15 @@ async def cmd_tasks_notifications(message: types.Message, state: FSMContext):
         state (FSMContext): состояние диалога
     """
     pre_msg = "Запуск генерации списка заявок. Пожалуйста ожидайте"
-    loop = asyncio.get_event_loop()
+    # loop = asyncio.get_event_loop()
     if is_private_chat(message):
         await message.answer(pre_msg)
-        # await send_personal_tasks()
-        loop.run_until_complete(send_personal_tasks())
+        await send_personal_tasks()
+        # loop.run_until_complete(send_personal_tasks())
     elif is_group_or_supergroup(message):
         await message.answer(pre_msg)
-        # await send_all_tasks()
-        loop.run_until_complete(send_all_tasks())
+        await send_all_tasks()
+        # loop.run_until_complete(send_all_tasks())
     else:
         logger.warning("Генерация отчета запрошена пользователем, \
                        не состоящим в группе и не прошедшим регистрацию")
@@ -238,6 +238,11 @@ async def process_full_timepicker(callback_query: CallbackQuery, callback_data: 
         task_new_param = await state.get_data()
         async with state.proxy() as data:
             data[MyTask.task_new_time_param] = r.time.strftime("%H:%M:%S")
+
+        task_modify = CobraTaskEdit(cobra_config)
+        task_n_abs = task_new_param[MyTask.task_id_param]
+        task_new_datetime =  f'{task_new_param[MyTask.task_new_date_param]} {r.time.strftime("%H:%M:%S")}'
+        task_modify.update_one_task_time(task_n_abs, task_new_datetime)
         await callback_query.message.answer(
             f'Выбрано время исполнения заявки №{task_new_param[MyTask.task_id_param]} {task_new_param[MyTask.task_new_date_param]} {r.time.strftime("%H:%M:%S")}',
             # reply_markup=start_kb
