@@ -2,7 +2,8 @@ from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
 from app.service.report import CobraTaskExcelReport
 import shutil
 from itertools import groupby
-from app.bot_global import bot, db_file, tg_config, cobra_config
+from app.handlers.state import MyTask
+from app.bot_global import bot, dp, db_file, tg_config, cobra_config
 from app.service.db import User
 import asyncio
 
@@ -63,9 +64,17 @@ async def send_personal_tasks():
             if (current_user):
                 report_message_personal = CobraTaskReportMessage()
                 report_message_personal.add_tehn_to_report_message(tehn)
+                tasks_for_accept = []
                 for task in one_tehn_tasks:
+                    tasks_for_accept.append(task['n_abs'])
                     report_message_personal.add_task_to_report_message(task)
                 report_message_personal.add_empty_string_to_report_message()
+                
+                # state = dp.current_state(user=current_user.chat_id)
+                # async with state.proxy() as data:
+                #     data[MyTask.tasks_for_user_accept_param] = tasks_for_accept
+
+
                 await bot.send_message(current_user.chat_id, report_message_personal.get_report_message_text(), parse_mode='html')
 
 

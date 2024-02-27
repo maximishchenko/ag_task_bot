@@ -152,12 +152,12 @@ class CobraTaskReportMessage:
             task (dict): словарь содержащий данные одной заявки, полученный из
             КПО Кобра
         """
-        task_string = f"{task['n_abs']}\r\n{task['numobj']} {task['nameobj']} {task['addrobj']}\r\n<code>{task['zay']}</code>"
+        task_string = f"{task['numobj']}\r\n{task['nameobj']} {task['addrobj']}\r\n<code>{task['zay']}</code>"
         self.message += str(task_string)
         self.add_empty_string_to_report_message()
-        self.message += f"<ins>Заявку подал: {task['who']}</ins>"
+        self.message += f"<ins>Заявку подал: {task['who']} ({task['prin']})</ins>"
         self.add_empty_string_to_report_message()
-        self.message += f"<ins>Заявку принял: {task['prin']} {task['timez']}</ins>"
+        self.message += f"<ins>Дата поступления: {task['timez']}</ins>"
         self.add_empty_string_to_report_message()
         self.add_empty_string_to_report_message()
 

@@ -21,3 +21,5 @@ class MyTask(StatesGroup):
     task_id_param = 'task_id'
     task_new_date_param = 'task_date'
     task_new_time_param = 'task_time'
+
+    tasks_for_user_accept_param = "tasks_for_accept"
