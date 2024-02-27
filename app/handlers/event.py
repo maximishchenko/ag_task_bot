@@ -3,7 +3,7 @@ from aiogram import Dispatcher, types
 from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 from aiogram_datepicker import Datepicker, DatepickerSettings
 from datetime import datetime
-from app.bot_global import db_file, cobra_config, dp, bot, tg_config
+from app.bot_global import db_file, cobra_config, dp, bot
 from app.service.db import User
 from app.bot_global import logger
 from app.handlers.state import MyTask
