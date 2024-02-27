@@ -60,7 +60,7 @@ class CobraTaskExcelReport(ExcelReport):
 
     def set_header(self):
         current_date = datetime.today().strftime("%d.%m.%Y")
-        self._sheet.merge_cells('A1:I1')
+        self._sheet.merge_cells('A1:H1')
         self._sheet["A1"] = f"Оперативные Заявки {current_date}"
         bold_font = Font(bold=True)
         self._sheet["A1"].font = (bold_font)
@@ -68,21 +68,20 @@ class CobraTaskExcelReport(ExcelReport):
 
     def set_footer(self):
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-        self._sheet.merge_cells('A' + str(self.max_row + 1) + ':I'  + str(self.max_row + 1))
+        self._sheet.merge_cells('A' + str(self.max_row + 1) + ':H'  + str(self.max_row + 1))
         self._sheet["A" + str(self.max_row + 1)] = f"Дата формирования отчета: {current_datetime}"
 
 
     def set_row(self, task: dict):
         if self.max_row == self.start_row:
-            self._sheet["A" + str(self.max_row)] = CobraTaskReportHeader().n_abs
-            self._sheet["B" + str(self.max_row)] = CobraTaskReportHeader().timez
-            self._sheet["C" + str(self.max_row)] = CobraTaskReportHeader().timev
-            self._sheet["D" + str(self.max_row)] = CobraTaskReportHeader().prin
-            self._sheet["E" + str(self.max_row)] = CobraTaskReportHeader().numobj
-            self._sheet["F" + str(self.max_row)] = CobraTaskReportHeader().nameobj
-            self._sheet["G" + str(self.max_row)] = CobraTaskReportHeader().addrobj
-            self._sheet["H" + str(self.max_row)] = CobraTaskReportHeader().zay
-            self._sheet["I" + str(self.max_row)] = CobraTaskReportHeader().tehn
+            self._sheet["A" + str(self.max_row)] = CobraTaskReportHeader().timez
+            self._sheet["B" + str(self.max_row)] = CobraTaskReportHeader().timev
+            self._sheet["C" + str(self.max_row)] = CobraTaskReportHeader().prin
+            self._sheet["D" + str(self.max_row)] = CobraTaskReportHeader().numobj
+            self._sheet["E" + str(self.max_row)] = CobraTaskReportHeader().nameobj
+            self._sheet["F" + str(self.max_row)] = CobraTaskReportHeader().addrobj
+            self._sheet["G" + str(self.max_row)] = CobraTaskReportHeader().zay
+            self._sheet["H" + str(self.max_row)] = CobraTaskReportHeader().tehn
             self._set_row_border(self.max_row)
             self._set_font_bold(self.max_row)
             self._add_row_by_number(task, str(self.max_row + 1))            
@@ -100,15 +99,14 @@ class CobraTaskExcelReport(ExcelReport):
         self.max_row += 1 if self.max_row > self.start_row else 2
 
     def _add_row_by_number(self, task: dict, number: int):
-        self._sheet["A" + str(number)] = task["n_abs"]
-        self._sheet["B" + str(number)] = task["timez"]
-        self._sheet["C" + str(number)] = task["timev"]
-        self._sheet["D" + str(number)] = task["prin"]
-        self._sheet["E" + str(number)] = task["numobj"]
-        self._sheet["F" + str(number)] = task["nameobj"]
-        self._sheet["G" + str(number)] = task["addrobj"]
-        self._sheet["H" + str(number)] = task["zay"]
-        self._sheet["I" + str(number)] = task["tehn"]
+        self._sheet["A" + str(number)] = task["timez"]
+        self._sheet["B" + str(number)] = task["timev"]
+        self._sheet["C" + str(number)] = task["prin"]
+        self._sheet["D" + str(number)] = task["numobj"]
+        self._sheet["E" + str(number)] = task["nameobj"]
+        self._sheet["F" + str(number)] = task["addrobj"]
+        self._sheet["G" + str(number)] = task["zay"]
+        self._sheet["H" + str(number)] = task["tehn"]
 
     def _set_row_border(self, number: int) -> None:
         thin_border = Side(border_style="thin", color="000000")
@@ -123,7 +121,6 @@ class CobraTaskExcelReport(ExcelReport):
         self._sheet["F" + str(number)].border = (border)
         self._sheet["G" + str(number)].border = (border)
         self._sheet["H" + str(number)].border = (border)
-        self._sheet["I" + str(number)].border = (border)
 
     def _set_text_alignment(self, number: int, wrap: bool = False):
         text_alignment = Alignment(wrap_text=wrap, horizontal='general',
@@ -136,7 +133,6 @@ class CobraTaskExcelReport(ExcelReport):
         self._sheet["F" + str(number)].alignment = text_alignment
         self._sheet["G" + str(number)].alignment = text_alignment
         self._sheet["H" + str(number)].alignment = text_alignment
-        self._sheet["I" + str(number)].alignment = text_alignment
 
     def _set_font_bold(self, number: int):
         bold_font = Font(bold=True)
@@ -148,15 +144,13 @@ class CobraTaskExcelReport(ExcelReport):
         self._sheet["F" + str(number)].font = (bold_font)
         self._sheet["G" + str(number)].font = (bold_font)
         self._sheet["H" + str(number)].font = (bold_font)
-        self._sheet["I" + str(number)].font = (bold_font)
 
     def _set_columns_width(self):
-        self._sheet.column_dimensions["A"].width = 15
+        self._sheet.column_dimensions["A"].width = 20
         self._sheet.column_dimensions["B"].width = 20
-        self._sheet.column_dimensions["C"].width = 20
-        self._sheet.column_dimensions["D"].width = 25
-        self._sheet.column_dimensions["E"].width = 20
-        self._sheet.column_dimensions["F"].width = 25
+        self._sheet.column_dimensions["C"].width = 25
+        self._sheet.column_dimensions["D"].width = 20
+        self._sheet.column_dimensions["E"].width = 25
+        self._sheet.column_dimensions["F"].width = 30
         self._sheet.column_dimensions["G"].width = 30
         self._sheet.column_dimensions["H"].width = 30
-        self._sheet.column_dimensions["I"].width = 30
