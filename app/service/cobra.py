@@ -108,15 +108,38 @@ class CobraTaskReport(CobraTable):
 
 
 class CobraTaskEdit(CobraTaskReport):
+    """ Реализует модификацию данных в таблице заявок """
 
     endpoint_root = 'api.table.edit'
+    """ Метод для редактирования данных таблиц """
     
-    def update_one_task_time(self, n_abs: int, event_time: str):
+    def update_one_task_time(self, n_abs: int, event_time: str) -> None:
+        """ Редактирует время исполнения одной заявки
+
+        Args:
+            n_abs (int): абсолютный номер заявки
+            event_time (str): время исполнения
+        """
         url = f"{self._endpoint_url}"
         params = {
             "name": self.table_name,
             "n_abs": n_abs,
             "fields": '[{"timev":"' + event_time + '"}]',
+        }
+        response = requests.get(url=url, params=params).json()
+
+    def accept_one_task(self, n_abs: int) -> None:
+        """ Устанавливает метку принятия заявки
+
+        Args:
+            n_abs (int): абсолютный номер заявки
+        """
+        current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+            "fields": '[{"r":"' + current_datetime + '", "sttech": "1"}]',
         }
         response = requests.get(url=url, params=params).json()
 

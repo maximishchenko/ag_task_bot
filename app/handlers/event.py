@@ -1,20 +1,14 @@
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher, types
-from tasks_notify import send_all_tasks, send_personal_tasks
-from app.service.config import TelegramConfig
-from aiogram.dispatcher.filters import ChatTypeFilter
-from app.bot_global import db_file, cobra_config, dp, bot
+from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
+from aiogram_datepicker import Datepicker, DatepickerSettings
+from datetime import datetime
+from app.bot_global import db_file, cobra_config, dp, bot, tg_config
 from app.service.db import User
 from app.bot_global import logger
 from app.handlers.state import MyTask
 from app.service.cobra import CobraTaskReport, CobraTaskReportMessage, CobraTaskEdit
-from aiogram_datepicker import Datepicker, DatepickerSettings
-from datetime import datetime
-from aiogram.types import Message, CallbackQuery
-from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
-# import asyncio
-
-tg_config = TelegramConfig()     
+from tasks_notify import send_all_tasks, send_personal_tasks
 
 user = User(db_file)   
 cobra_tasks = CobraTaskReport(cobra_config)
@@ -232,7 +226,7 @@ async def process_datepicker(callback_query: types.CallbackQuery, callback_data:
     await callback_query.answer()
 
 @dp.callback_query_handler(full_timep_callback.filter())
-async def process_full_timepicker(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
+async def process_full_timepicker(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
     r = await FullTimePicker().process_selection(callback_query, callback_data)
     if r.selected:
         task_new_param = await state.get_data()
@@ -242,13 +236,13 @@ async def process_full_timepicker(callback_query: CallbackQuery, callback_data: 
         task_modify = CobraTaskEdit(cobra_config)
         task_n_abs = task_new_param[MyTask.task_id_param]
         task_new_datetime =  f'{task_new_param[MyTask.task_new_date_param]} {r.time.strftime("%H:%M:%S")}'
+        task_modify.accept_one_task(task_n_abs)
         task_modify.update_one_task_time(task_n_abs, task_new_datetime)
         await callback_query.message.answer(
             f'Выбрано время исполнения заявки №{task_new_param[MyTask.task_id_param]} {task_new_param[MyTask.task_new_date_param]} {r.time.strftime("%H:%M:%S")}',
             # reply_markup=start_kb
         )
         await callback_query.message.delete_reply_markup()
-
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith("close_action"))
 async def close_task_action(callback: types.CallbackQuery):
@@ -260,7 +254,6 @@ async def close_task_action(callback: types.CallbackQuery):
     cobra_task_id, chat_id = get_task_action_params(callback.data)
     await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
     await bot.send_message(chat_id, "Реализовать закрытие заявки")
-
 
 def register_handlers_event(dp: Dispatcher):
     dp.register_message_handler(
