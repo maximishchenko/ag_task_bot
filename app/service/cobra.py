@@ -159,7 +159,7 @@ class CobraTaskReportMessage:
         self.add_empty_string_to_report_message()
         self.message += f"<ins>Дата поступления: {task['timez']}</ins>"
         self.add_empty_string_to_report_message()
-        self.add_empty_string_to_report_message()
+        # self.add_empty_string_to_report_message()
 
     def add_empty_string_to_report_message(self) -> None:
         """Добавляет пустую строку в текст сообщения отчета"""
