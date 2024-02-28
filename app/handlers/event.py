@@ -1,23 +1,30 @@
-from aiogram.dispatcher import FSMContext
-from aiogram import Dispatcher, types
-from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
-from aiogram_datepicker import Datepicker, DatepickerSettings
+"""
+Обработчики событий диалога с ботом.
+
+Взаимодействие с модулями КПО Кобра.
+"""
+
 from datetime import datetime
-from app.bot_global import db_file, cobra_config, dp, bot
-from app.service.db import User
-from app.bot_global import logger
+
+from aiogram import Dispatcher, types
+from aiogram.dispatcher import FSMContext
+from aiogram_datepicker import Datepicker, DatepickerSettings
+from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
+
+from app.bot_global import bot, cobra_config, db_file, dp, logger
 from app.handlers.state import MyTask
-from app.service.cobra import CobraTaskReport
-from app.service.cobra import CobraTaskReportMessage
-from app.service.cobra import CobraTaskEdit
+from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
+from app.service.db import User
 from tasks_notify import send_all_tasks, send_personal_tasks
 
+# TODO перенести в bot_global.py
 user = User(db_file)
 cobra_tasks = CobraTaskReport(cobra_config)
 
 
 def is_group_or_supergroup(message: types.Message) -> bool:
-    """Проверяет пришло ли полученное сообщение в группу или супергруппу
+    """
+    Проверяет пришло ли полученное сообщение в группу или супергруппу.
 
     Args:
         message (types.Message): полученное сообщение
@@ -25,14 +32,13 @@ def is_group_or_supergroup(message: types.Message) -> bool:
     Returns:
         bool: резуальтат проверки
     """
-    return (
-        message.chat.type == types.ChatType.GROUP
-        or message.chat.type == types.ChatType.SUPERGROUP
-    )
+    type = message.chat.type
+    return type == types.ChatType.GROUP or type == types.ChatType.SUPERGROUP
 
 
 def is_private_chat(message: types.Message) -> bool:
-    """Проверяет пришло ли полученное сообщение в приватный чат
+    """
+    Проверяет пришло ли полученное сообщение в приватный чат.
 
     Args:
         message (types.Message): полученное сообщение
@@ -46,13 +52,32 @@ def is_private_chat(message: types.Message) -> bool:
 
 
 def get_task_action_params(data: str) -> tuple:
+    """
+    Возвращает параметры функции обратного вызова для обработки заявки.
+
+    Разбирает строку передаваемую функции обратного вызова, через
+    InlineKeyboard. Возвращает параметры
+
+    Args:
+        data (str): строка, содержащая данные параметров для функции обратного
+        вызова
+
+    Returns:
+        tuple: набор параметров
+    """
     params = data.split("|")
     cobra_task_id = params[1]
     chat_id = params[2]
     return cobra_task_id, chat_id
 
 
-def get_datepicker_settings():
+def get_datepicker_settings() -> DatepickerSettings:
+    """
+    Возвращает настройки виджета календаря.
+
+    Returns:
+        DatepickerSettings: Параметры виджета календаря.
+    """
     return DatepickerSettings(
         initial_view="day",  # available views -> day, month, year
         initial_date=datetime.now().date(),  # default date
@@ -113,7 +138,9 @@ def get_datepicker_settings():
 
 
 async def cmd_tasks_notify(message: types.Message, state: FSMContext):
-    """Генерация списка оперативных заявоук в зависимости от типа чата
+    """
+    Генерация списка оперативных заявоук в зависимости от типа чата.
+
     Если команда была передана в группе - вернет общий список заявок
     Если команда была передана в приватном чате - персональный список заявок
     при наличии
@@ -123,15 +150,12 @@ async def cmd_tasks_notify(message: types.Message, state: FSMContext):
         state (FSMContext): состояние диалога
     """
     pre_msg = "Запуск генерации списка заявок. Пожалуйста ожидайте"
-    # loop = asyncio.get_event_loop()
     if is_private_chat(message):
         await message.answer(pre_msg)
         await send_personal_tasks()
-        # loop.run_until_complete(send_personal_tasks())
     elif is_group_or_supergroup(message):
         await message.answer(pre_msg)
         await send_all_tasks()
-        # loop.run_until_complete(send_all_tasks())
     else:
         logger.warning(
             "Генерация отчета запрошена пользователем, \
@@ -140,7 +164,8 @@ async def cmd_tasks_notify(message: types.Message, state: FSMContext):
 
 
 async def cmd_my_tasks(message: types.Message, state: FSMContext):
-    """Получение списка заявок текущего зарегистрированного пользователя
+    """
+    Получение списка заявок текущего зарегистрированного пользователя.
 
     Args:
         message (types.Message): сообщение Telegram
@@ -187,7 +212,9 @@ async def cmd_my_tasks(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith("task"))
 async def task_actions(callback: types.CallbackQuery):
-    """Действие при выборе заявки
+    """
+    Действие при выборе заявки.
+
     Генерация кнопок со списком доступных действий
 
     Args:
@@ -224,7 +251,10 @@ async def task_actions(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith("view_act"))
 async def view_task_action(callback: types.CallbackQuery):
-    """Просмотр заявки
+    """
+    Просмотр заявки.
+
+    Присылает ответное сообщение с детальным описанием заявки
 
     Args:
         callback (types.CallbackQuery): полученная функция обратного вызова
@@ -244,7 +274,10 @@ async def view_task_action(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(lambda c: c.data.startswith("change_act"))
 async def change_date_action(callback: types.CallbackQuery, state: FSMContext):
-    """Перенос даты заявки
+    """
+    Перенос даты заявки.
+
+    Позволяет запустить процесс изменяющий дату исполнения заявки в КПО Кобра.
 
     Args:
         callback (types.CallbackQuery): полученная функция обратного вызова
@@ -255,8 +288,6 @@ async def change_date_action(callback: types.CallbackQuery, state: FSMContext):
     )
     datepicker = Datepicker(get_datepicker_settings())
     markup = datepicker.start_calendar()
-
-    # await MyTask.waiting_input_date.set()
     async with state.proxy() as data:
         data[MyTask.task_id_param] = cobra_task_id
     await callback.message.answer(
@@ -268,7 +299,12 @@ async def change_date_action(callback: types.CallbackQuery, state: FSMContext):
 async def process_datepicker(
     callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext
 ):
-    """Обрабатывает выбор даты в календаре
+    """
+    Обрабатывает выбор даты в календаре.
+
+    Принимает данные (дата переноса заявки) от виджета DatePicker.
+    Запрашивает время, на которое будет перенесена заявка.
+    Направляет запрос в КПО Кобра
 
     Args:
         callback_query (types.CallbackQuery): _description_
@@ -297,6 +333,17 @@ async def process_datepicker(
 async def process_full_timepicker(
     callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext
 ):
+    """
+    Обрабатывает данные, полученные от виджета TimePicker.
+
+    Направляет информацию о дате переноса заявки в КПО Кобра.
+    Устанавливает метку принятия заявки техником при необходимости
+
+    Args:
+        callback_query (types.CallbackQuery): _description_
+        callback_data (dict): _description_
+        state (FSMContext): _description_
+    """
     r = await FullTimePicker().process_selection(callback_query, callback_data)
     if r.selected:
         task_new_param = await state.get_data()
@@ -320,7 +367,8 @@ async def process_full_timepicker(
 
 @dp.callback_query_handler(lambda c: c.data.startswith("close_action"))
 async def close_task_action(callback: types.CallbackQuery):
-    """Закрытие заявки
+    """
+    Закрытие заявки.
 
     Args:
         callback (types.CallbackQuery): полученная функция обратного вызова
@@ -333,5 +381,11 @@ async def close_task_action(callback: types.CallbackQuery):
 
 
 def register_handlers_event(dp: Dispatcher):
+    """
+    Регистрация обработчиков событий модуля.
+
+    Args:
+        dp (Dispatcher): обработчик событий
+    """
     dp.register_message_handler(cmd_tasks_notify, commands="tasks", state="*")
     dp.register_message_handler(cmd_my_tasks, commands="my_tasks", state="*")
