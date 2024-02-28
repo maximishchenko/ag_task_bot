@@ -20,6 +20,8 @@ repos:
           - flake8-bugbear
           - flake8-print
           - pep8-naming
+          - flake8-docstrings
+          - flake8-requirements
 -   repo: 'https://github.com/psf/black'
     rev: 24.2.0
     hooks:

@@ -8,14 +8,10 @@ import asyncio
 import shutil
 from itertools import groupby
 
-from app.bot_global import bot  # noqa
-from app.bot_global import cobra_config  # noqa
-from app.bot_global import db_file  # noqa
-from app.bot_global import tg_config  # noqa
-from app.service.cobra import CobraTaskReport  # noqa
-from app.service.cobra import CobraTaskReportMessage  # noqa
-from app.service.db import User  # noqa
-from app.service.report import CobraTaskExcelReport  # noqa
+from app.bot_global import bot, cobra_config, db_file, tg_config
+from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
+from app.service.db import User
+from app.service.report import CobraTaskExcelReport
 
 
 async def send_all_tasks():

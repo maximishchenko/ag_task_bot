@@ -7,11 +7,10 @@
 
 import asyncio
 
-import aiocron  # noqa
+import aiocron
 
-from app.bot_global import tg_config  # noqa
-from tasks_notify import send_all_tasks  # noqa
-from tasks_notify import send_personal_tasks  # noqa
+from app.bot_global import tg_config
+from tasks_notify import send_all_tasks, send_personal_tasks
 
 
 async def main():
