@@ -1,10 +1,26 @@
-from tasks_notify import send_all_tasks, send_personal_tasks
+"""
+Скрипт реализует функции планировщика заданий приложения.
+
+Используется для запуска заплатированных заданий и управления ими средствами
+приложения. Запуск возможен через systemd или supervisor
+"""
+
 import asyncio
-import aiocron
-from app.bot_global import tg_config
+
+import aiocron  # noqa
+
+from app.bot_global import tg_config  # noqa
+from tasks_notify import send_all_tasks  # noqa
+from tasks_notify import send_personal_tasks  # noqa
 
 
 async def main():
+    """
+    Реализация планировщика заданий.
+
+    Направляет общие и персональные уведомления по времени, заданном в
+    файле конфигурации настроек
+    """
     task_full_report_time = tg_config.get_task_full_report_shedule_time()
     task_full_report_min = task_full_report_time[1]
     task_full_report_hour = task_full_report_time[0]

@@ -1,14 +1,28 @@
-from aiogram import Bot, Dispatcher, executor
-from aiogram.types import BotCommand
-from app.handlers.common import register_handlers_common
-from app.handlers.signup import register_handlers_signup
-from app.handlers.event import register_handlers_event
-from app.bot_global import bot, dp
+"""
+Скрипт запуска бота.
 
-PYTHONDONTWRITEBYTECODE = 1
+Реализует интерфейс взаимодействия с функциями бота
+"""
+
+from aiogram import Bot  # noqa
+from aiogram import Dispatcher  # noqa
+from aiogram import executor  # noqa
+from aiogram.types import BotCommand  # noqa
+
+from app.bot_global import bot as bot_app  # noqa
+from app.bot_global import dp  # noqa
+from app.handlers.common import register_handlers_common  # noqa
+from app.handlers.event import register_handlers_event  # noqa
+from app.handlers.signup import register_handlers_signup  # noqa
 
 
 async def set_commands(bot: Bot):
+    """
+    Установка команд бота.
+
+    Args:
+        bot (Bot): экземпляр бота
+    """
     commands = [
         BotCommand(command="/signup", description="Регистрация"),
         BotCommand(command="/tasks", description="Генерация списка заявок"),
@@ -19,17 +33,33 @@ async def set_commands(bot: Bot):
 
 
 async def shutdown(dispatcher: Dispatcher):
-    """Действие при завершении"""
+    """
+    Действие при завершении.
+
+    Сохраняет состояние диалога при завершении работы приложения
+
+    Args:
+        dispatcher (Dispatcher): диспетчер обновлений
+    """
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()
 
 
 async def startup(dispatcher: Dispatcher):
-    """Действие перед запуском"""
+    """
+
+    Действие перед запуском.
+
+    Регистрация обработчиков событий.
+    Установка команд бота
+
+    Args:
+        dispatcher (Dispatcher): диспетчер обновлений
+    """
     register_handlers_common(dispatcher)
     register_handlers_signup(dispatcher)
     register_handlers_event(dispatcher)
-    await set_commands(bot)
+    await set_commands(bot_app)
 
 
 if __name__ == "__main__":
