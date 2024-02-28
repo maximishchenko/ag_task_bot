@@ -154,7 +154,7 @@ class CobraTaskReportMessage:
     def add_report_header(self) -> None:
         """Добавляет заголовок к сообщению отчета"""
         current_date = datetime.today().strftime("%d.%m.%Y")
-        self.message += f"<b>Оперативные Заявки {current_date}</b>"
+        self.message += f"<b>Аварийные Заявки {current_date}</b>"
         self.add_empty_string_to_report_message()
         self.add_empty_string_to_report_message()
 

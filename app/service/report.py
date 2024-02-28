@@ -50,7 +50,7 @@ class ExcelReport(ABC):
 class CobraTaskExcelReport(ExcelReport):
     """Реализация отчета, содержащего данные открытых заявок"""
 
-    file_name = "Оперативные_заявки"
+    file_name = "Аварийные_заявки"
     """ Имя генерируемого файла без расширения """
 
     max_row = 3
@@ -61,7 +61,7 @@ class CobraTaskExcelReport(ExcelReport):
     def set_header(self):
         current_date = datetime.today().strftime("%d.%m.%Y")
         self._sheet.merge_cells('A1:H1')
-        self._sheet["A1"] = f"Оперативные Заявки {current_date}"
+        self._sheet["A1"] = f"Аварийные Заявки {current_date}"
         bold_font = Font(bold=True)
         self._sheet["A1"].font = (bold_font)
         self._sheet["A1"].alignment = Alignment(horizontal='center')
