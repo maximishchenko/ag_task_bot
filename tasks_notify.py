@@ -1,20 +1,34 @@
-from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
-from app.service.report import CobraTaskExcelReport
+"""
+Скрипт для отправки уведомлений в чаты Telegram по расписанию планировщика.
+
+Отправляет общую информацию в группу и персональные уведомления
+"""
+
+import asyncio
 import shutil
 from itertools import groupby
-from app.bot_global import bot, db_file, tg_config, cobra_config
-from app.service.db import User
-import asyncio
 
-PYTHONDONTWRITEBYTECODE = 1
+from app.bot_global import bot  # noqa
+from app.bot_global import cobra_config  # noqa
+from app.bot_global import db_file  # noqa
+from app.bot_global import tg_config  # noqa
+from app.service.cobra import CobraTaskReport  # noqa
+from app.service.cobra import CobraTaskReportMessage  # noqa
+from app.service.db import User  # noqa
+from app.service.report import CobraTaskExcelReport  # noqa
 
 
 async def send_all_tasks():
+    """
+    Формирование общей статистики по аварийным заявкам .
+
+    Запрашивает статистику заявок по аварийным объектам не старше
+    текущей даты из КПО Кобра. Сортирует по исполнителю.
+    Отправляет в общую группу
+    """
     cobra_base = CobraTaskReport(cobra_config)
     task_objects = cobra_base.get_tasks()
-    # Запрос заявок из КПО Кобра
-    if len(task_objects):
-        # Генерация файла отчета и текста сообщения в Telegram
+    if task_objects:
         task_report = CobraTaskExcelReport()
         report_message = CobraTaskReportMessage()
         report_message.add_report_header()
@@ -33,7 +47,6 @@ async def send_all_tasks():
         task_report.save()
         report_message.add_generation_datetime()
 
-        # Отправка уведомлений Telegram
         for chat in tg_config.get_task_full_report_chat_ids():
             report_msg = report_message.get_report_message_text()
             await bot.send_message(chat, report_msg, parse_mode="html")
@@ -53,11 +66,17 @@ async def send_all_tasks():
 
 
 async def send_personal_tasks():
+    """
+    Отправляет персональные уведомления.
+
+    Выбирает заявки каждого техника, с датой исполнения не превосходящей
+    текущую дату. В случае, если техник прошел процедуру регистрации -
+    отправляет персональное уведомление
+    """
     user = User(db_file)
     cobra_base = CobraTaskReport(cobra_config)
     task_objects = cobra_base.get_tasks()
-    if len(task_objects):
-        # Генерация файла отчета и текста сообщения в Telegram
+    if task_objects:
         for tehn, one_tehn_tasks in groupby(
             task_objects, lambda task_list: task_list["tehn"]
         ):
