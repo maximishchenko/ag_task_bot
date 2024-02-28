@@ -30,7 +30,7 @@ async def send_all_tasks():
                 report_message.add_task_to_report_message(task)
                 task_report.set_row(task)
 
-            report_message.add_empty_string_to_report_message()
+                report_message.add_empty_string_to_report_message()
         task_report.set_footer()
         task_report.save()
         report_message.add_generation_datetime()
