@@ -20,13 +20,15 @@ class CobraConfig(Config):
     """ Название секции файла конфигурации """
 
     host_param = "host"
-    """ Имя параметра, хранящего адрес или FQDN-имя хоста для подключения к КПО Кобра """
+    """ Имя параметра, хранящего адрес или FQDN-имя хоста для подключения к КПО
+      Кобра """
 
     port_param = "port"
     """ Имя параметра, хранящего порт для подключения к КПО КОбра """
 
     token_param = "token"
-    """ Имя параметра, хранящего пароль удаленного доступа pud для подключения к КПО Кобра """
+    """ Имя параметра, хранящего пароль удаленного доступа pud для подключения
+    к КПО Кобра """
 
     def get_host(self) -> str:
         """Возвращает адрес хоста или FQDN-имя сервера КПО Кобра"""
@@ -37,7 +39,8 @@ class CobraConfig(Config):
         return self.config.get(self.section, self.port_param)
 
     def get_token(self) -> str:
-        """Возвращает пароль удаленного доступа pud для подключения к КПО Кобра"""
+        """Возвращает пароль удаленного доступа pud для подключения к
+        КПО Кобра"""
         return self.config.get(self.section, self.token_param)
 
 
@@ -53,14 +56,16 @@ class TelegramConfig(Config):
     task_full_report_chat_ids = "task_full_report_chat_ids"
     """ Имя параметра, хранящего данные с ID чата в Telegram """
 
-    admin_chat_ids_param = 'admin_chat_ids'
+    admin_chat_ids_param = "admin_chat_ids"
     """ Имя параметра, хранящего данные ID чатов администраторов в Telegram """
 
-    task_full_report_time = 'task_full_report_time'
-    """ Имя параметра, хранящего время запуска генерации отчета для отправки в группу """
+    task_full_report_time = "task_full_report_time"
+    """ Имя параметра, хранящего время запуска генерации отчета для отправки
+    в группу """
 
-    task_personal_report_time = 'task_personal_report_time'
-    """ Имя параметра, хранящего время запуска генерации отчета для отправки перснальных уведомлений """
+    task_personal_report_time = "task_personal_report_time"
+    """ Имя параметра, хранящего время запуска генерации отчета для отправки
+    перснальных уведомлений """
 
     def get_token(self) -> str:
         """Возвращает токен бота Telegram"""
@@ -68,23 +73,28 @@ class TelegramConfig(Config):
 
     def get_task_full_report_chat_ids(self) -> tuple:
         """Возвращает ID чата в Telegram для отправки уведомлений"""
-        chat_ids = self.config.get(self.section, self.task_full_report_chat_ids)
-        return tuple(chat_ids.split(','))
-    
+        task_chat_ids = self.task_full_report_chat_ids
+        chat_ids = self.config.get(self.section, task_chat_ids)
+        return tuple(chat_ids.split(","))
+
     def get_task_full_report_shedule_time(self) -> tuple:
-        """ Возвращает время запуска генерации отчета для отправки в группу """
-        return tuple(self.config.get(self.section, self.task_full_report_time).split(":"))
-    
+        """Возвращает время запуска генерации отчета для отправки в группу"""
+        sch_time = self.config.get(self.section, self.task_full_report_time)
+        return tuple(sch_time.split(":"))
+
     def get_task_personal_report_shedule_time(self) -> tuple:
-        """ Возвращает время запуска генерации отчета для отправки персональных уведомлений """
-        return tuple(self.config.get(self.section, self.task_personal_report_time).split(":"))
-    
+        """Возвращает время запуска генерации отчета для отправки персональных
+        уведомлений"""
+        report_time = self.task_personal_report_time
+        sch_time = self.config.get(self.section, report_time)
+        return tuple(sch_time.split(":"))
+
     def get_admin_chat_ids(self) -> tuple:
-        """ Возвращает ID чатов администраторов бота в Telegram
+        """Возвращает ID чатов администраторов бота в Telegram
 
         Returns:
             tuple: кортеж, содержащий ID чатов администраторов в Telegram
         """
-        admin_chat_ids = self.config.get(self.section, self.admin_chat_ids_param)
-        admin_chat_ids_list = admin_chat_ids.split(",")
+        chat_ids = self.config.get(self.section, self.admin_chat_ids_param)
+        admin_chat_ids_list = chat_ids.split(",")
         return tuple(admin_chat_ids_list)

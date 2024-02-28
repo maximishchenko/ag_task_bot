@@ -2,11 +2,13 @@ from abc import ABC
 from datetime import datetime
 from app.service.config import CobraConfig
 import requests
-import urllib.request, urllib.parse
-from app.service.db import MobileAppAccount, CobraOneLkUser
+import urllib.request
+import urllib.parse
+from app.service.db import MobileAppAccount
+from app.service.db import CobraOneLkUser
 
 
-class CobraTaskReportHeader:
+class TaskReportHeader:
     """Объект передачи данных, содержащий соответствие названий заголовков
     таблицы полям, возвращаемым REST API КПО Кобра"""
 
@@ -28,7 +30,8 @@ class CobraTable(ABC):
     """ Метод для получения данных таблиц """
 
     token_key = "pud"
-    """ Наименование параметра, в котором передается пароль удаленного доступа """
+    """ Наименование параметра, в котором передается пароль
+    удаленного доступа """
 
     def __init__(self, config: CobraConfig) -> None:
         self._host = config.get_host()
@@ -45,7 +48,7 @@ class CobraTable(ABC):
 
 class CobraTaskReport(CobraTable):
     """Реализует запрос к REST API КПО Кобра, формирует параметры запроса
-    (фильтр, набор возвращаемых полей) """
+    (фильтр, набор возвращаемых полей)"""
 
     name_template = "***"
     """ Шаблон наименования заявки. В отчет попадают только заявки, формируемые
@@ -60,19 +63,19 @@ class CobraTaskReport(CobraTable):
         tasks_list = list()
         current_date = datetime.today().date()
         for task in response:
-            timev = datetime.strptime(task['timev'], "%d.%m.%Y %H:%M:%S").date()
-            if current_date >= timev:
+            timev = datetime.strptime(task["timev"], "%d.%m.%Y %H:%M:%S")
+            if current_date >= timev.date():
                 tasks_list.append(task)
         return tuple(tasks_list)
-    
+
     def get_my_tasks(self, name: str) -> tuple:
         response = self._get_unfinished_tasks()
         tasks_list = []
         for task in response:
-            if task['tehn'] == name:
+            if task["tehn"] == name:
                 tasks_list.append(task)
         return tuple(tasks_list)
-    
+
     def get_one_task(self, n_abs: str) -> tuple:
         url = f"{self._endpoint_url}"
         params = {
@@ -81,7 +84,7 @@ class CobraTaskReport(CobraTable):
             "fields": self._get_fields(),
         }
         response = requests.get(url=url, params=params).json()
-        return response["result"][0],
+        return (response["result"][0],)
 
     def _get_unfinished_tasks(self):
         """Запрос текущих заявок из КПО Кобра"""
@@ -103,18 +106,20 @@ class CobraTaskReport(CobraTable):
     def _get_fields(self):
         """Запрос полей из таблицы КПО Кобра, соответствующих
         формату генерируемого отчета"""
-        fields_value = '[{"n_abs": "1"}, {"zay": "1"}, {"prin": "1"}, {"timez": "1"}, {"nameobj": "1"}, {"numobj": "1"}, {"addrobj": "1"}, {"tehn": "1"}, {"timev": "1"}, {"who": 1}]'
+        fields_value = '[{"n_abs": "1"}, {"zay": "1"}, {"prin": "1"}, \
+{"timez": "1"}, {"nameobj": "1"}, {"numobj": "1"}, {"addrobj": "1"}, \
+{"tehn": "1"}, {"timev": "1"}, {"who": 1}]'
         return f"{fields_value}"
 
 
 class CobraTaskEdit(CobraTaskReport):
-    """ Реализует модификацию данных в таблице заявок """
+    """Реализует модификацию данных в таблице заявок"""
 
-    endpoint_root = 'api.table.edit'
+    endpoint_root = "api.table.edit"
     """ Метод для редактирования данных таблиц """
-    
+
     def update_one_task_time(self, n_abs: int, event_time: str) -> None:
-        """ Редактирует время исполнения одной заявки
+        """Редактирует время исполнения одной заявки
 
         Args:
             n_abs (int): абсолютный номер заявки
@@ -126,22 +131,37 @@ class CobraTaskEdit(CobraTaskReport):
             "n_abs": n_abs,
             "fields": '[{"timev":"' + event_time + '"}]',
         }
-        response = requests.get(url=url, params=params).json()
+        requests.get(url=url, params=params).json()
 
     def accept_one_task(self, n_abs: int) -> None:
-        """ Устанавливает метку принятия заявки
+        """Устанавливает метку принятия заявки
 
         Args:
             n_abs (int): абсолютный номер заявки
         """
-        current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
         url = f"{self._endpoint_url}"
         params = {
             "name": self.table_name,
             "n_abs": n_abs,
-            "fields": '[{"r":"' + current_datetime + '", "sttech": "1"}]',
+            "fields": '[{"sttech": "1"}]',
         }
-        response = requests.get(url=url, params=params).json()
+        requests.get(url=url, params=params).json()
+        self._set_task_accept_time(n_abs)
+
+    def _set_task_accept_time(self, n_abs: int) -> None:
+        """Указывыает время принятия заявки
+
+        Args:
+            n_abs (int): абсолютный номер заявки
+        """
+        current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+            "fields": '[{"timer":"' + current_datetime + '"}]',
+        }
+        requests.get(url=url, params=params).json()
 
 
 class CobraTaskReportMessage:
@@ -175,14 +195,15 @@ class CobraTaskReportMessage:
             task (dict): словарь содержащий данные одной заявки, полученный из
             КПО Кобра
         """
-        task_string = f"{task['numobj']}\r\n{task['nameobj']} {task['addrobj']}\r\n<code>{task['zay']}</code>"
+        task_string = f"{task['numobj']}\r\n{task['nameobj']} \
+{task['addrobj']}\r\n<code>{task['zay']}</code>"
         self.message += str(task_string)
         self.add_empty_string_to_report_message()
-        self.message += f"<ins>Заявку подал: {task['who']} ({task['prin']})</ins>"
+        self.message += f"<ins>Заявку подал: {task['who']} \
+({task['prin']})</ins>"
         self.add_empty_string_to_report_message()
         self.message += f"<ins>Дата поступления: {task['timez']}</ins>"
         self.add_empty_string_to_report_message()
-        # self.add_empty_string_to_report_message()
 
     def add_empty_string_to_report_message(self) -> None:
         """Добавляет пустую строку в текст сообщения отчета"""
@@ -191,7 +212,8 @@ class CobraTaskReportMessage:
     def add_generation_datetime(self) -> None:
         self.add_empty_string_to_report_message()
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-        self.message += f"<ins>Дата формирования отчета: {current_datetime}</ins>"
+        self.message += f"<ins>Дата формирования отчета: \
+{current_datetime}</ins>"
 
     def get_report_message_text(self) -> str:
         """Возвращает сгенерированную строку сообщения отчета
@@ -200,7 +222,7 @@ class CobraTaskReportMessage:
             str: строка сообщения отчета
         """
         return self.message
-    
+
 
 class CobraTehn(CobraTable):
 
@@ -210,11 +232,19 @@ class CobraTehn(CobraTable):
     def is_account_valid(self, account: MobileAppAccount) -> bool:
         lk_users = self._get_tehn_list()
         for tehn in lk_users:
-            lk_user = CobraOneLkUser(n_abs=tehn['n_abs'], name=tehn['fio'], status=tehn['status'], password=tehn['pass'])
-            if account.username == lk_user.name and account.password == lk_user.password:
+            lk_user = CobraOneLkUser(
+                n_abs=tehn["n_abs"],
+                name=tehn["fio"],
+                status=tehn["status"],
+                password=tehn["pass"],
+            )
+            if (
+                account.username == lk_user.name
+                and account.password == lk_user.password
+            ):
                 return True
         return False
-    
+
     def _get_tehn_list(self):
         url = f"{self._endpoint_url}"
         params = {

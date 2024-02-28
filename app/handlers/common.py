@@ -1,6 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher, types
 
+
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer(
@@ -9,11 +10,11 @@ async def cmd_start(message: types.Message, state: FSMContext):
 выберите в меню бота команду /signup"
     )
 
+
 async def cmd_cancel(message: types.Message, state: FSMContext):
     await state.finish()
-    await message.answer(
-        "Диалог завершен", reply_markup=types.ReplyKeyboardRemove()
-    )
+    reply_kb = types.ReplyKeyboardRemove()
+    await message.answer("Диалог завершен", reply_markup=reply_kb)
 
 
 def register_handlers_common(dp: Dispatcher):

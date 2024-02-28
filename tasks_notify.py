@@ -2,19 +2,17 @@ from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
 from app.service.report import CobraTaskExcelReport
 import shutil
 from itertools import groupby
-from app.handlers.state import MyTask
-from app.bot_global import bot, dp, db_file, tg_config, cobra_config
+from app.bot_global import bot, db_file, tg_config, cobra_config
 from app.service.db import User
 import asyncio
 
-PYTHONDONTWRITEBYTECODE=1
+PYTHONDONTWRITEBYTECODE = 1
 
 
 async def send_all_tasks():
-    user = User(db_file)
     cobra_base = CobraTaskReport(cobra_config)
     task_objects = cobra_base.get_tasks()
-    # Запрос заявок из КПО Кобра 
+    # Запрос заявок из КПО Кобра
     if len(task_objects):
         # Генерация файла отчета и текста сообщения в Telegram
         task_report = CobraTaskExcelReport()
@@ -37,12 +35,15 @@ async def send_all_tasks():
 
         # Отправка уведомлений Telegram
         for chat in tg_config.get_task_full_report_chat_ids():
-            await bot.send_message(chat, report_message.get_report_message_text(), parse_mode='html')
-            await bot.send_document(chat, open(task_report.export_filename, 'rb'))
+            report_msg = report_message.get_report_message_text()
+            await bot.send_message(chat, report_msg, parse_mode="html")
+            document = open(task_report.export_filename, "rb")
+            await bot.send_document(chat, document)
     else:
         for chat in tg_config.get_task_full_report_chat_ids():
-            await bot.send_message(chat, "Заявки на текущую дату отсутствуют", parse_mode='html')
-
+            await bot.send_message(
+                chat, "Заявки на текущую дату отсутствуют", parse_mode="html"
+            )
 
     # Очистка каталог экспорта отчетов
     shutil.rmtree(
@@ -51,31 +52,30 @@ async def send_all_tasks():
     )
 
 
-async def send_personal_tasks(): 
+async def send_personal_tasks():
     user = User(db_file)
     cobra_base = CobraTaskReport(cobra_config)
-    task_objects = cobra_base.get_tasks()    
+    task_objects = cobra_base.get_tasks()
     if len(task_objects):
         # Генерация файла отчета и текста сообщения в Telegram
         for tehn, one_tehn_tasks in groupby(
             task_objects, lambda task_list: task_list["tehn"]
         ):
             current_user = user.get_user_by_tehn(tehn)
-            if (current_user):
+            if current_user:
                 report_message_personal = CobraTaskReportMessage()
                 report_message_personal.add_tehn_to_report_message(tehn)
                 tasks_for_accept = []
                 for task in one_tehn_tasks:
-                    tasks_for_accept.append(task['n_abs'])
+                    tasks_for_accept.append(task["n_abs"])
                     report_message_personal.add_task_to_report_message(task)
                 report_message_personal.add_empty_string_to_report_message()
-                
-                # state = dp.current_state(user=current_user.chat_id)
-                # async with state.proxy() as data:
-                #     data[MyTask.tasks_for_user_accept_param] = tasks_for_accept
 
-
-                await bot.send_message(current_user.chat_id, report_message_personal.get_report_message_text(), parse_mode='html')
+                await bot.send_message(
+                    current_user.chat_id,
+                    report_message_personal.get_report_message_text(),
+                    parse_mode="html",
+                )
 
 
 if __name__ == "__main__":

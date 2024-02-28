@@ -13,7 +13,7 @@ pip install pipenv
 git clone git@github.com:maximishchenko/ag_task_bot.git
 ```
 
-* Активировать виртуальное окружение 
+* Активировать виртуальное окружение
 
 ```
 pipenv shell

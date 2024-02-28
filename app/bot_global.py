@@ -21,4 +21,4 @@ asyncio.set_event_loop(loop)
 bot = Bot(token=tg_config.get_token(), loop=loop)
 dp = Dispatcher(bot, storage=JSONStorage(fsm_state_file))
 
-db_file = 'db.sqlite3'
+db_file = "db.sqlite3"

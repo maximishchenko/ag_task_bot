@@ -16,6 +16,8 @@ aiogram-timepicker = "*"
 [dev-packages]
 mypy = "*"
 black = "*"
+flake8 = "*"
+isort = "*"
 
 [requires]
 python_version = "3.10"

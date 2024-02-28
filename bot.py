@@ -5,7 +5,8 @@ from app.handlers.signup import register_handlers_signup
 from app.handlers.event import register_handlers_event
 from app.bot_global import bot, dp
 
-PYTHONDONTWRITEBYTECODE=1
+PYTHONDONTWRITEBYTECODE = 1
+
 
 async def set_commands(bot: Bot):
     commands = [
@@ -16,17 +17,20 @@ async def set_commands(bot: Bot):
     ]
     await bot.set_my_commands(commands)
 
+
 async def shutdown(dispatcher: Dispatcher):
-    """ Действие при завершении """
+    """Действие при завершении"""
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()
 
+
 async def startup(dispatcher: Dispatcher):
-    """ Действие перед запуском """
+    """Действие перед запуском"""
     register_handlers_common(dispatcher)
     register_handlers_signup(dispatcher)
     register_handlers_event(dispatcher)
     await set_commands(bot)
+
 
 if __name__ == "__main__":
     executor.start_polling(dp, on_shutdown=shutdown, on_startup=startup)

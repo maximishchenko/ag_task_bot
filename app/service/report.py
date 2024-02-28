@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font, Alignment
-from app.service.cobra import CobraTaskReportHeader
+from app.service.cobra import TaskReportHeader
 
 
 class ExcelReport(ABC):
@@ -29,8 +29,8 @@ class ExcelReport(ABC):
 
     def _set_file_name(self) -> Path:
         """Генерация пути к файлу экспорта
-        Имя файла экспорта должно задаваться атрибутом file_name в классе-потомке
-        """
+        Имя файла экспорта должно задаваться атрибутом file_name в
+        классе-потомке"""
         self._create_export_path_if_not_exists()
         current_datetime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         return Path(
@@ -60,41 +60,44 @@ class CobraTaskExcelReport(ExcelReport):
 
     def set_header(self):
         current_date = datetime.today().strftime("%d.%m.%Y")
-        self._sheet.merge_cells('A1:H1')
+        self._sheet.merge_cells("A1:H1")
         self._sheet["A1"] = f"Аварийные Заявки {current_date}"
         bold_font = Font(bold=True)
-        self._sheet["A1"].font = (bold_font)
-        self._sheet["A1"].alignment = Alignment(horizontal='center')
+        self._sheet["A1"].font = bold_font
+        self._sheet["A1"].alignment = Alignment(horizontal="center")
 
     def set_footer(self):
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-        self._sheet.merge_cells('A' + str(self.max_row + 1) + ':H'  + str(self.max_row + 1))
-        self._sheet["A" + str(self.max_row + 1)] = f"Дата формирования отчета: {current_datetime}"
-
+        self._sheet.merge_cells(
+            "A" + str(self.max_row + 1) + ":H" + str(self.max_row + 1)
+        )
+        self._sheet["A" + str(self.max_row + 1)] = (
+            f"Дата формирования отчета: {current_datetime}"
+        )
 
     def set_row(self, task: dict):
         if self.max_row == self.start_row:
-            self._sheet["A" + str(self.max_row)] = CobraTaskReportHeader().timez
-            self._sheet["B" + str(self.max_row)] = CobraTaskReportHeader().timev
-            self._sheet["C" + str(self.max_row)] = CobraTaskReportHeader().prin
-            self._sheet["D" + str(self.max_row)] = CobraTaskReportHeader().numobj
-            self._sheet["E" + str(self.max_row)] = CobraTaskReportHeader().nameobj
-            self._sheet["F" + str(self.max_row)] = CobraTaskReportHeader().addrobj
-            self._sheet["G" + str(self.max_row)] = CobraTaskReportHeader().zay
-            self._sheet["H" + str(self.max_row)] = CobraTaskReportHeader().tehn
+            self._sheet["A" + str(self.max_row)] = TaskReportHeader().timez
+            self._sheet["B" + str(self.max_row)] = TaskReportHeader().timev
+            self._sheet["C" + str(self.max_row)] = TaskReportHeader().prin
+            self._sheet["D" + str(self.max_row)] = TaskReportHeader().numobj
+            self._sheet["E" + str(self.max_row)] = TaskReportHeader().nameobj
+            self._sheet["F" + str(self.max_row)] = TaskReportHeader().addrobj
+            self._sheet["G" + str(self.max_row)] = TaskReportHeader().zay
+            self._sheet["H" + str(self.max_row)] = TaskReportHeader().tehn
             self._set_row_border(self.max_row)
             self._set_font_bold(self.max_row)
-            self._add_row_by_number(task, str(self.max_row + 1))            
+            self._add_row_by_number(task, str(self.max_row + 1))
             self._set_row_border(str(self.max_row + 1))
             self._set_text_alignment(str(self.max_row + 1), True)
         else:
-            self._add_row_by_number(task, self.max_row)      
+            self._add_row_by_number(task, self.max_row)
             self._set_row_border(self.max_row)
             self._set_text_alignment(self.max_row, True)
 
         """ Установка ширины столбцов """
         self._set_columns_width()
-        """ Увеличение счетчика номера строки для следующей итерации. 
+        """ Увеличение счетчика номера строки для следующей итерации.
         Увеличение на 2 для 1-й записи, т.к. добавляются заголовки таблицы """
         self.max_row += 1 if self.max_row > self.start_row else 2
 
@@ -109,41 +112,38 @@ class CobraTaskExcelReport(ExcelReport):
         self._sheet["H" + str(number)] = task["tehn"]
 
     def _set_row_border(self, number: int) -> None:
-        thin_border = Side(border_style="thin", color="000000")
-        border = Border(
-            top=thin_border, left=thin_border, right=thin_border, bottom=thin_border
-        )
-        self._sheet["A" + str(number)].border = (border)
-        self._sheet["B" + str(number)].border = (border)
-        self._sheet["C" + str(number)].border = (border)
-        self._sheet["D" + str(number)].border = (border)
-        self._sheet["E" + str(number)].border = (border)
-        self._sheet["F" + str(number)].border = (border)
-        self._sheet["G" + str(number)].border = (border)
-        self._sheet["H" + str(number)].border = (border)
+        brdr = Side(border_style="thin", color="000000")
+        border = Border(top=brdr, left=brdr, right=brdr, bottom=brdr)
+        self._sheet["A" + str(number)].border = border
+        self._sheet["B" + str(number)].border = border
+        self._sheet["C" + str(number)].border = border
+        self._sheet["D" + str(number)].border = border
+        self._sheet["E" + str(number)].border = border
+        self._sheet["F" + str(number)].border = border
+        self._sheet["G" + str(number)].border = border
+        self._sheet["H" + str(number)].border = border
 
     def _set_text_alignment(self, number: int, wrap: bool = False):
-        text_alignment = Alignment(wrap_text=wrap, horizontal='general',
-                                     vertical='top')
-        self._sheet["A" + str(number)].alignment = text_alignment
-        self._sheet["B" + str(number)].alignment = text_alignment
-        self._sheet["C" + str(number)].alignment = text_alignment
-        self._sheet["D" + str(number)].alignment = text_alignment
-        self._sheet["E" + str(number)].alignment = text_alignment
-        self._sheet["F" + str(number)].alignment = text_alignment
-        self._sheet["G" + str(number)].alignment = text_alignment
-        self._sheet["H" + str(number)].alignment = text_alignment
+        align = Alignment(wrap_text=wrap, horizontal="general", vertical="top")
+        self._sheet["A" + str(number)].alignment = align
+        self._sheet["B" + str(number)].alignment = align
+        self._sheet["C" + str(number)].alignment = align
+        self._sheet["D" + str(number)].alignment = align
+        self._sheet["E" + str(number)].alignment = align
+        self._sheet["F" + str(number)].alignment = align
+        self._sheet["G" + str(number)].alignment = align
+        self._sheet["H" + str(number)].alignment = align
 
     def _set_font_bold(self, number: int):
         bold_font = Font(bold=True)
-        self._sheet["A" + str(number)].font = (bold_font)
-        self._sheet["B" + str(number)].font = (bold_font)
-        self._sheet["C" + str(number)].font = (bold_font)
-        self._sheet["D" + str(number)].font = (bold_font)
-        self._sheet["E" + str(number)].font = (bold_font)
-        self._sheet["F" + str(number)].font = (bold_font)
-        self._sheet["G" + str(number)].font = (bold_font)
-        self._sheet["H" + str(number)].font = (bold_font)
+        self._sheet["A" + str(number)].font = bold_font
+        self._sheet["B" + str(number)].font = bold_font
+        self._sheet["C" + str(number)].font = bold_font
+        self._sheet["D" + str(number)].font = bold_font
+        self._sheet["E" + str(number)].font = bold_font
+        self._sheet["F" + str(number)].font = bold_font
+        self._sheet["G" + str(number)].font = bold_font
+        self._sheet["H" + str(number)].font = bold_font
 
     def _set_columns_width(self):
         self._sheet.column_dimensions["A"].width = 20
