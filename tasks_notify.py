@@ -76,6 +76,7 @@ async def send_personal_tasks():
         for tehn, one_tehn_tasks in groupby(
             task_objects, lambda task_list: task_list["tehn"]
         ):
+            print(tehn)
             current_user = user.get_user_by_tehn(tehn)
             if current_user:
                 report_message_personal = CobraTaskReportMessage()
@@ -91,6 +92,10 @@ async def send_personal_tasks():
                     report_message_personal.get_report_message_text(),
                     parse_mode="html",
                 )
+            else:
+                print("Оперативные заявки для вас отсутствуют")
+    else:
+        print("Оперативные заявки отсутствуют")
 
 
 if __name__ == "__main__":

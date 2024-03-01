@@ -11,9 +11,11 @@ from aiogram.dispatcher import FSMContext
 from aiogram_datepicker import Datepicker, DatepickerSettings
 from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 
-from app.bot_global import bot, cobra_config, db_file, dp, logger
+from app.bot_global import bot, cobra_config, db_file, dp, logger, tg_config
 from app.handlers.state import MyTask
-from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
+from app.service.cobra import (CobraTaskEdit, 
+                               CobraTaskReport, 
+                               CobraTaskReportMessage)
 from app.service.db import User
 from tasks_notify import send_all_tasks, send_personal_tasks
 
@@ -154,6 +156,13 @@ async def cmd_tasks_notify(message: types.Message, state: FSMContext):
         await message.answer(pre_msg)
         await send_personal_tasks()
     elif is_group_or_supergroup(message):
+        if str(message.from_user.id) not in tg_config.get_admin_chat_ids():
+            await message.answer(
+                "Вы не имеете права выполнять запрошенную \
+команду в группе. Если вам нужна персональная статистика - перейдите в \
+приватный чат с ботом"
+            )
+            return
         await message.answer(pre_msg)
         await send_all_tasks()
     else:
