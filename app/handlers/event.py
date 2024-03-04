@@ -13,9 +13,7 @@ from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 
 from app.bot_global import bot, cobra_config, db_file, dp, logger, tg_config
 from app.handlers.state import MyTask
-from app.service.cobra import (CobraTaskEdit, 
-                               CobraTaskReport, 
-                               CobraTaskReportMessage)
+from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
 from app.service.db import User
 from tasks_notify import send_all_tasks, send_personal_tasks
 
@@ -387,6 +385,26 @@ async def close_task_action(callback: types.CallbackQuery):
         chat_id=callback.from_user.id, message_id=callback.message.message_id
     )
     await bot.send_message(chat_id, "Реализовать закрытие заявки")
+
+
+@dp.callback_query_handler(lambda c: c.data.startswith("accept_action"))
+async def accept_tasks(callback: types.CallbackQuery):
+    params = callback.data.split("|")
+    tehn = params[1]
+    current_date = datetime.today().strftime("%d.%m.%Y")
+    msg = f"{tehn} с соcтавом аварийных заявок на {current_date} ознакомлен"
+    # TODO - Метка принято в кобре
+
+    # task_modify = CobraTaskEdit(cobra_config)
+    # task_modify.accept_one_task(task_n_abs)
+    # task_modify.update_one_task_time(task_n_abs, task_new_datetime)
+
+    for chat in tg_config.get_task_full_report_chat_ids():
+        await bot.send_message(
+            chat,
+            msg,
+            # reply_to_message_id=
+        )
 
 
 def register_handlers_event(dp: Dispatcher):

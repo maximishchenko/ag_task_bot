@@ -8,6 +8,8 @@ import asyncio
 import shutil
 from itertools import groupby
 
+from aiogram import types
+
 from app.bot_global import bot, cobra_config, db_file, tg_config
 from app.service.cobra import CobraTaskReport, CobraTaskReportMessage
 from app.service.db import User
@@ -76,7 +78,6 @@ async def send_personal_tasks():
         for tehn, one_tehn_tasks in groupby(
             task_objects, lambda task_list: task_list["tehn"]
         ):
-            print(tehn)
             current_user = user.get_user_by_tehn(tehn)
             if current_user:
                 report_message_personal = CobraTaskReportMessage()
@@ -86,16 +87,35 @@ async def send_personal_tasks():
                     tasks_for_accept.append(task["n_abs"])
                     report_message_personal.add_task_to_report_message(task)
                 report_message_personal.add_empty_string_to_report_message()
-
+                kb = (
+                    types.InlineKeyboardButton(
+                        text="Ознакомлен",
+                        callback_data=f"accept_action|{task['tehn']}",
+                    ),
+                )
+                accept_kb = types.InlineKeyboardMarkup(inline_keyboard=[kb])
                 await bot.send_message(
                     current_user.chat_id,
                     report_message_personal.get_report_message_text(),
                     parse_mode="html",
+                    reply_markup=accept_kb,
                 )
-            else:
-                print("Оперативные заявки для вас отсутствуют")
-    else:
-        print("Оперативные заявки отсутствуют")
+            # else:
+            # logger.info("Оперативные заявки для вас отсутствуют")
+    # else:
+    # print("Оперативные заявки отсутствуют")
+
+    # kb = types.InlineKeyboardButton(
+    #         text="Ознакомлен",
+    #         callback_data="accept_action|Иванов И.И.",
+    #     ),
+    # accept_kb = types.InlineKeyboardMarkup(inline_keyboard=[kb])
+    # await bot.send_message(
+    #     "159240833",
+    #     "123123123",
+    #     parse_mode="html",
+    #     reply_markup=accept_kb
+    # )
 
 
 if __name__ == "__main__":
