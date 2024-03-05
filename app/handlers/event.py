@@ -405,6 +405,12 @@ async def accept_tasks(callback: types.CallbackQuery):
             msg,
             # reply_to_message_id=
         )
+    # await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
+    await bot.edit_message_reply_markup(
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        reply_markup=None
+    )
 
 
 def register_handlers_event(dp: Dispatcher):
