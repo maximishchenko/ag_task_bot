@@ -409,7 +409,7 @@ async def accept_tasks(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(
         chat_id=callback.from_user.id,
         message_id=callback.message.message_id,
-        reply_markup=None
+        reply_markup=None,
     )
 
 
