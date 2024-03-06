@@ -158,7 +158,7 @@ async def cmd_tasks_notify(message: types.Message, state: FSMContext):
             await message.answer(
                 "Вы не имеете права выполнять запрошенную \
 команду в группе. Если вам нужна персональная статистика - перейдите в \
-приватный чат с ботом"
+личный чат с ботом"
             )
             return
         await message.answer(pre_msg)
@@ -211,7 +211,7 @@ async def cmd_my_tasks(message: types.Message, state: FSMContext):
             await message.answer("У вас нет заявок")
     else:
         msg = "Запрос событий доступен только для зарегистрированных \
-пользователей в приватном чате с ботом"
+пользователей в личном чате с ботом"
         await message.answer(msg)
         logger.warning(msg)
         return

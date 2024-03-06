@@ -1,11 +1,12 @@
+import urllib.parse
+import urllib.request
 from abc import ABC
 from datetime import datetime
-from app.service.config import CobraConfig
+
 import requests
-import urllib.request
-import urllib.parse
-from app.service.db import MobileAppAccount
-from app.service.db import CobraOneLkUser
+
+from app.service.config import CobraConfig
+from app.service.db import CobraOneLkUser, MobileAppAccount
 
 
 class TaskReportHeader:
