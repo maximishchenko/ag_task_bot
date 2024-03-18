@@ -13,7 +13,12 @@ from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 
 from app.bot_global import bot, cobra_config, db_file, dp, logger, tg_config
 from app.handlers.state import MyTask
-from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
+from app.service.cobra import (
+    CobraTaskDelete,
+    CobraTaskEdit,
+    CobraTaskReport,
+    CobraTaskReportMessage,
+)
 from app.service.db import User
 from tasks_notify import send_all_tasks, send_personal_tasks
 
@@ -242,11 +247,12 @@ async def task_actions(callback: types.CallbackQuery):
                 callback_data=f"change_act|{cobra_task_id}|{chat_id}",
             ),
         ],
-        # [
-        #    types.InlineKeyboardButton(
-        #        text="Закрыть заявку",
-        #        callback_data=f"close_action|{cobra_task_id}|{chat_id}"),
-        # ]
+        [
+            types.InlineKeyboardButton(
+                text="Закрыть заявку",
+                callback_data=f"close_action|{cobra_task_id}|{chat_id}",
+            ),
+        ],
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
     await bot.send_message(
@@ -384,7 +390,19 @@ async def close_task_action(callback: types.CallbackQuery):
     await bot.delete_message(
         chat_id=callback.from_user.id, message_id=callback.message.message_id
     )
-    await bot.send_message(chat_id, "Реализовать закрытие заявки")
+    task_delete = CobraTaskDelete(cobra_config)
+    task_delete.delete_one_task(cobra_task_id)
+    msg = f"Заявка {cobra_task_id} закрыта"
+    for chat in tg_config.get_task_full_report_chat_ids():
+        await bot.send_message(
+            chat,
+            msg,
+        )
+    # await bot.edit_message_reply_markup(
+    #     chat_id=callback.from_user.id,
+    #     message_id=callback.message.message_id,
+    #     reply_markup=None,
+    # )
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("accept_action"))

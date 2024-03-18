@@ -165,6 +165,20 @@ class CobraTaskEdit(CobraTaskReport):
         requests.get(url=url, params=params).json()
 
 
+class CobraTaskDelete(CobraTaskReport):
+    """Реализует удаления данных в таблице заявок"""
+
+    endpoint_root = "api.table.delete"
+
+    def delete_one_task(self, n_abs: int) -> None:
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+        }
+        requests.get(url=url, params=params).json()
+
+
 class CobraTaskReportMessage:
     """Генерация текста сообщения отчета на основании данных
     заявки из КПО Кобра"""

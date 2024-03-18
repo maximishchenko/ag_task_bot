@@ -28,22 +28,33 @@ async def send_all_tasks():
     task_objects = cobra_base.get_tasks()
     if task_objects:
         task_report = CobraTaskExcelReport()
+        task_report.set_header()
+        tehn_count = 0
         report_message = CobraTaskReportMessage()
         report_message.add_report_header()
-        task_report.set_header()
         for tehn, one_tehn_tasks in groupby(
             task_objects, lambda task_list: task_list["tehn"]
         ):
-
+            tehn_count += 1
             report_message.add_tehn_to_report_message(tehn)
             for task in one_tehn_tasks:
-                report_message.add_task_to_report_message(task)
                 task_report.set_row(task)
-
+                report_message.add_task_to_report_message(task)
                 report_message.add_empty_string_to_report_message()
+
+            if tehn_count == 3:
+                report_message.add_generation_datetime()
+                for chat in tg_config.get_task_full_report_chat_ids():
+                    report_msg = report_message.get_report_message_text()
+                    await bot.send_message(chat, report_msg, parse_mode="html")
+                report_message = CobraTaskReportMessage()
+                report_message.add_report_header()
+                tehn_count = 0
+
+        report_message.add_generation_datetime()
+
         task_report.set_footer()
         task_report.save()
-        report_message.add_generation_datetime()
 
         for chat in tg_config.get_task_full_report_chat_ids():
             report_msg = report_message.get_report_message_text()
@@ -100,22 +111,6 @@ async def send_personal_tasks():
                     parse_mode="html",
                     reply_markup=accept_kb,
                 )
-            # else:
-            # logger.info("Оперативные заявки для вас отсутствуют")
-    # else:
-    # print("Оперативные заявки отсутствуют")
-
-    # kb = types.InlineKeyboardButton(
-    #         text="Ознакомлен",
-    #         callback_data="accept_action|Иванов И.И.",
-    #     ),
-    # accept_kb = types.InlineKeyboardMarkup(inline_keyboard=[kb])
-    # await bot.send_message(
-    #     "159240833",
-    #     "123123123",
-    #     parse_mode="html",
-    #     reply_markup=accept_kb
-    # )
 
 
 if __name__ == "__main__":
