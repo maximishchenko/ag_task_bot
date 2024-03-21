@@ -242,10 +242,10 @@ async def task_actions(callback: types.CallbackQuery):
                 text="Просмотр заявки",
                 callback_data=f"view_act|{cobra_task_id}|{chat_id}",
             ),
-            types.InlineKeyboardButton(
-                text="Перенос заявки",
-                callback_data=f"change_act|{cobra_task_id}|{chat_id}",
-            ),
+            # types.InlineKeyboardButton(
+            #     text="Перенос заявки",
+            #     callback_data=f"change_act|{cobra_task_id}|{chat_id}",
+            # ),
         ],
         [
             types.InlineKeyboardButton(
