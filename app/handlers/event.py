@@ -398,37 +398,44 @@ async def close_task_action(callback: types.CallbackQuery):
             chat,
             msg,
         )
-    # await bot.edit_message_reply_markup(
-    #     chat_id=callback.from_user.id,
-    #     message_id=callback.message.message_id,
-    #     reply_markup=None,
-    # )
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("accept_action"))
 async def accept_tasks(callback: types.CallbackQuery):
-    params = callback.data.split("|")
-    tehn = params[1]
-    current_date = datetime.today().strftime("%d.%m.%Y")
-    msg = f"{tehn} с соcтавом аварийных заявок на {current_date} ознакомлен"
-    # TODO - Метка принято в кобре
+    """ Установка признака принятия заявки техником
+    
+    Удаляет клавиатуру для избежания повторного нажатия. Запрашивает список
+    заявок текущего техника. Устанавливает метку "Принято". Задает дату/время
+    принятия заявки. Направляет уведомление в группу
 
-    # task_modify = CobraTaskEdit(cobra_config)
-    # task_modify.accept_one_task(task_n_abs)
-    # task_modify.update_one_task_time(task_n_abs, task_new_datetime)
+    Args:
+        callback (types.CallbackQuery): полученная функция обратного вызова
+    """
 
-    for chat in tg_config.get_task_full_report_chat_ids():
-        await bot.send_message(
-            chat,
-            msg,
-            # reply_to_message_id=
-        )
-    # await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
     await bot.edit_message_reply_markup(
         chat_id=callback.from_user.id,
         message_id=callback.message.message_id,
         reply_markup=None,
     )
+
+    params = callback.data.split("|")
+    tehn = params[1]
+    my_tasks = cobra_tasks.get_my_tasks(tehn)
+    current_date = datetime.today().strftime("%d.%m.%Y")
+    current_datetime = datetime.today().strftime("%d.%m.%Y %H:%M:%S")
+    msg = f"{tehn} с соcтавом аварийных заявок на {current_date} \
+ознакомлен"
+
+    for task in my_tasks:
+        task_modify = CobraTaskEdit(cobra_config)
+        task_modify.accept_one_task(task['n_abs'])
+        task_modify.update_one_task_time(task['n_abs'], current_datetime)
+
+    for chat in tg_config.get_task_full_report_chat_ids():
+        await bot.send_message(
+            chat,
+            msg,
+        )
 
 
 def register_handlers_event(dp: Dispatcher):
