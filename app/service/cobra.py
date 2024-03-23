@@ -149,6 +149,24 @@ class CobraTaskEdit(CobraTaskReport):
         requests.get(url=url, params=params).json()
         self._set_task_accept_time(n_abs)
 
+    def finish_one_task(self, n_abs: int) -> None:
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+            "fields": '[{"sttech": "3"}]',
+        }
+        requests.get(url=url, params=params).json()
+
+    def add_finish_task_reason(self, n_abs: int, reason: str) -> None:
+        url = f"{self._endpoint_url}"
+        params = {
+            "name": self.table_name,
+            "n_abs": n_abs,
+            "fields": '[{"rez":"' + reason + '"}]',
+        }
+        requests.get(url=url, params=params).json()
+
     def _set_task_accept_time(self, n_abs: int) -> None:
         """Указывыает время принятия заявки
 

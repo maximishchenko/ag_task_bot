@@ -5,6 +5,12 @@
 """
 
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from enum import Enum
+
+class TaskParam(Enum):
+
+    task_id = "task_id"
+    reason_for_close = "reason_for_close"
 
 
 class Signup(StatesGroup):
@@ -33,8 +39,13 @@ class MyTask(StatesGroup):
     waiting_input_date = State()
     waiting_input_time = State()
 
+    # TODO перенести в TaskParam
     task_id_param = "task_id"
     task_new_date_param = "task_date"
     task_new_time_param = "task_time"
-
     tasks_for_user_accept_param = "tasks_for_accept"
+
+
+class CloseMyTaskDialog(StatesGroup):
+
+    waiting_input_reason = State()
