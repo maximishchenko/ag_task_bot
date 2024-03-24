@@ -57,8 +57,8 @@ async def send_all_tasks():
         task_report.save()
 
         for chat in tg_config.get_task_full_report_chat_ids():
-            report_msg = report_message.get_report_message_text()
-            await bot.send_message(chat, report_msg, parse_mode="html")
+            # report_msg = report_message.get_report_message_text()
+            # await bot.send_message(chat, report_msg, parse_mode="html")
             document = open(task_report.export_filename, "rb")
             await bot.send_document(chat, document)
     else:
