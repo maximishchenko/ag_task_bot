@@ -1,4 +1,5 @@
 **/__pycache__/
 .mypy_cache/
 out/
+yoyo.ini
 db.sqlite3

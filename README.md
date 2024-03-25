@@ -33,10 +33,16 @@ pipenv install
 cp template/config/config.ini.template config/config.ini
 cp template/config/log.ini.template config/log.ini
 ```
+> В случае, когда производится первоначальное развертывание БД, необходимо илициализировать миграции yoyo
 
-* Скопировать шаблон базы данных
+> Важно! Имя БД db.sqlite3 привязано в коде приложения
 ```
-cp template/db.sqlite3 db.sqlite3
+yoyo init --database sqlite:///db.sqlite3 migration
+
+```
+* Применить миграции базы данных
+```
+yoyo apply
 ```
 
 * Указать парметры подключения к КПО Кобра и Telegram Bot API
