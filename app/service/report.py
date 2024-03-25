@@ -40,17 +40,12 @@ class ExcelReport(ABC):
 
         Имя файла экспорта задается атрибутом file_name в классе-потомке.
         """
-        # self._create_export_path_if_not_exists()
         current_datetime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         file_path = Path(
             f"{self.export_path}{current_datetime}_\
 {self.file_name}.{self.file_suffix}"  # type: ignore
         )
         return file_path
-
-        # def _create_export_path_if_not_exists(self):
-        """Создает каталог экспорта в случае его отсутствия."""
-        # Path(self.export_path).mkdir(parents=True, exist_ok=True)
 
 
 class CobraTaskExcelReport(ExcelReport):
