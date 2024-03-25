@@ -568,6 +568,12 @@ async def accept_tasks(callback: types.CallbackQuery):
         )
 
 
+# @dp.callback_query_handler(lambda c: c.data.startwith("responsibility_action"))
+# async def change_responsibility_persons(callback: types.CallbackQuery):
+#     # TODO добавить реализацию.
+#     pass
+
+
 def register_handlers_event(dp: Dispatcher):
     """
     Регистрация обработчиков событий модуля.

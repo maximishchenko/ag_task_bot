@@ -99,13 +99,22 @@ async def send_personal_tasks():
                     tasks_for_accept.append(task["n_abs"])
                     report_message_personal.add_task_to_report_message(task)
                 report_message_personal.add_empty_string_to_report_message()
-                kb = (
-                    types.InlineKeyboardButton(
-                        text="Ознакомлен",
-                        callback_data=f"accept_action|{task['tehn']}",
-                    ),
-                )
-                accept_kb = types.InlineKeyboardMarkup(inline_keyboard=[kb])
+
+                kb = [
+                    [
+                        types.InlineKeyboardButton(
+                            text="Ознакомлен",
+                            callback_data=f"accept_action|{task['tehn']}",
+                        ),
+                    ],
+                    [
+                        types.InlineKeyboardButton(
+                            text="Корректировка ответственных лиц",
+                            callback_data=f"responsibility_action|{task['tehn']}",
+                        ),
+                    ],
+                ]
+                accept_kb = types.InlineKeyboardMarkup(inline_keyboard=kb)
                 await bot.send_message(
                     current_user.chat_id,
                     report_message_personal.get_report_message_text(),
