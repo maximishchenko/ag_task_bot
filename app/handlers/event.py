@@ -12,15 +12,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram_datepicker import Datepicker, DatepickerSettings
 from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 
-from app.bot_global import bot, cobra_config, db_file, dp, logger, tg_config
+from app.bot_global import bot, cobra_config, cobra_tasks, dp, logger, tg_config, user
 from app.handlers.state import CloseMyTaskDialog, MyTask, TaskParam
-from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
-from app.service.db import User
+from app.service.cobra import CobraTaskEdit, CobraTaskReportMessage
 from tasks_notify import send_all_tasks, send_personal_tasks
-
-# TODO перенести в bot_global.py
-user = User(db_file)
-cobra_tasks = CobraTaskReport(cobra_config)
 
 
 def is_group_or_supergroup(message: types.Message) -> bool:

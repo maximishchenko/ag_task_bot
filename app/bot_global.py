@@ -13,7 +13,9 @@ import logging.config
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.files import JSONStorage
 
+from app.service.cobra import CobraTaskReport, CobraTehn
 from app.service.config import CobraConfig, TelegramConfig
+from app.service.db import User
 
 config_file = "config/config.ini"
 fsm_state_file = "job/states.json"
@@ -32,3 +34,8 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 bot = Bot(token=tg_config.get_token(), loop=loop)
 dp = Dispatcher(bot, storage=JSONStorage(fsm_state_file))
+
+
+user = User(db_file)
+cobra_tasks = CobraTaskReport(cobra_config)
+cobra_account = CobraTehn(cobra_config)

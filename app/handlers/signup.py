@@ -11,15 +11,11 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import ChatTypeFilter
 
-from app.bot_global import cobra_config, db_file
+from app.bot_global import cobra_account, user
 from app.handlers.state import Signup
-from app.service.cobra import CobraTehn
-from app.service.db import MobileAppAccount, OneUser, User
+from app.service.db import MobileAppAccount, OneUser
 from app.service.status import Status
 
-# TODO перенести в bot_global.py
-user = User(db_file)
-cobra_account = CobraTehn(cobra_config)
 signup_state = Signup()
 
 
