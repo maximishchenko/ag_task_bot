@@ -4,6 +4,7 @@
 Взаимодействие с модулями КПО Кобра.
 """
 
+# Standard Library
 from datetime import datetime
 
 from aiogram import Dispatcher, types
@@ -12,15 +13,8 @@ from aiogram_datepicker import Datepicker, DatepickerSettings
 from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
 
 from app.bot_global import bot, cobra_config, db_file, dp, logger, tg_config
-from app.handlers.state import MyTask
-from app.handlers.state import CloseMyTaskDialog
-from app.handlers.state import TaskParam
-from app.service.cobra import (
-    CobraTaskDelete,
-    CobraTaskEdit,
-    CobraTaskReport,
-    CobraTaskReportMessage,
-)
+from app.handlers.state import CloseMyTaskDialog, MyTask, TaskParam
+from app.service.cobra import CobraTaskEdit, CobraTaskReport, CobraTaskReportMessage
 from app.service.db import User
 from tasks_notify import send_all_tasks, send_personal_tasks
 
@@ -145,23 +139,30 @@ def get_datepicker_settings() -> DatepickerSettings:
 
 
 def get_close_task_buttons() -> types.InlineKeyboardMarkup:
+    """Возвращает доступные действия для подтверждения закрытия задачи.
+
+    Кнопки: подтверждение, корректировка отмена.
+
+    Returns:
+        types.InlineKeyboardMarkup: inline-keyboard-markup
+    """
     my_actions_btns = [
         [
             types.InlineKeyboardButton(
                 text="Подтвердить",
-                callback_data=f"closing_act_accept",
+                callback_data="closing_act_accept",
             ),
         ],
         [
             types.InlineKeyboardButton(
                 text="Корректировать текст результата",
-                callback_data=f"closing_act_edit",
+                callback_data="closing_act_edit",
             ),
         ],
         [
             types.InlineKeyboardButton(
                 text="Отмена",
-                callback_data=f"closing_act_cancel",
+                callback_data="closing_act_cancel",
             ),
         ],
     ]
@@ -247,14 +248,14 @@ async def cmd_my_tasks(message: types.Message, state: FSMContext):
         await message.answer(msg)
         logger.warning(msg)
         return
-    
+
 
 async def ask_before_close(message: types.Message, state: FSMContext) -> str:
-    """Запрос причины закрытия заявки
+    """Запрос причины закрытия заявки.
 
     Args:
-        message (types.Message): полученное сообщение
-        state (FSMContext): текущее состояние диалога
+        message (types.Message): полученное сообщение.
+        state (FSMContext): текущее состояние диалога.
 
     Returns:
         str: текст сообщения
@@ -266,7 +267,7 @@ async def ask_before_close(message: types.Message, state: FSMContext) -> str:
 
 
 async def cmd_close_task(message: types.Message, state: FSMContext):
-    """Принимает текст с результатом закрытия заявки
+    """Принимает текст с результатом закрытия заявки.
 
     После ввода текста отправляет кнопки, позволяющие подтвердить закрытие
     заявки, скорректировать текст, или отменить закрытие.
@@ -463,13 +464,13 @@ async def close_task_action(callback: types.CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(
-        lambda c: c.data == 'closing_act_cancel',
-        state=CloseMyTaskDialog.waiting_input_reason
-    )
+    lambda c: c.data == "closing_act_cancel",
+    state=CloseMyTaskDialog.waiting_input_reason,
+)
 async def cancel_closing_task(callback: types.CallbackQuery, state: FSMContext):
-    """Отмена действия закрытия заявки
+    """Отмена действия закрытия заявки.
 
-    Удаляет клавиатуру. Завершает диалог. 
+    Удаляет клавиатуру. Завершает диалог.
     Присылает уведомление ответным сообщением
 
     Args:
@@ -485,21 +486,15 @@ async def cancel_closing_task(callback: types.CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(
-        lambda c: c.data == 'closing_act_edit',
-        state=CloseMyTaskDialog.waiting_input_reason
-    )
-async def edit_closing_task_reason(
-    callback: types.CallbackQuery,
-    state: FSMContext
-):
-    """Модифицирует текст результата завершения заявки
+    lambda c: c.data == "closing_act_edit", state=CloseMyTaskDialog.waiting_input_reason
+)
+async def edit_closing_task_reason(callback: types.CallbackQuery):
+    """Модифицирует текст результата завершения заявки.
 
     Args:
         callback (types.CallbackQuery): полученная функция обратного вызова
         state (FSMContext): текущее состояние диалога
     """
-    task_param = await state.get_data()
-    cobra_task_id = task_param[TaskParam.task_id.value]
     await bot.delete_message(
         chat_id=callback.from_user.id, message_id=callback.message.message_id
     )
@@ -507,13 +502,13 @@ async def edit_closing_task_reason(
 
 
 @dp.callback_query_handler(
-        lambda c: c.data == 'closing_act_accept',
-        state=CloseMyTaskDialog.waiting_input_reason
-    )
+    lambda c: c.data == "closing_act_accept",
+    state=CloseMyTaskDialog.waiting_input_reason,
+)
 async def accept_closing_task(callback: types.CallbackQuery, state: FSMContext):
     """Подтверждение закрытия заявки.
 
-    Завершает заявку. Отправляет уведомление пользователю. Отправляет 
+    Завершает заявку. Отправляет уведомление пользователю. Отправляет
     уведомления в группу. Завершает состояние диалога
 
     Args:
@@ -526,7 +521,7 @@ async def accept_closing_task(callback: types.CallbackQuery, state: FSMContext):
     my_user = user.get_user(callback.message.chat.id)
     msg = f"Заявка {cobra_task_id} закрыта. Техник: {my_user.tehn} \
 Результат: {task_closing_reason}"
-    
+
     task_modify = CobraTaskEdit(cobra_config)
     task_modify.finish_one_task(cobra_task_id)
     task_modify.add_finish_task_reason(cobra_task_id, task_closing_reason)
@@ -543,8 +538,8 @@ async def accept_closing_task(callback: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(lambda c: c.data.startswith("accept_action"))
 async def accept_tasks(callback: types.CallbackQuery):
-    """ Установка признака принятия заявки техником
-    
+    """Установка признака принятия заявки техником.
+
     Удаляет клавиатуру для избежания повторного нажатия. Запрашивает список
     заявок текущего техника. Устанавливает метку "Принято". Задает дату/время
     принятия заявки. Направляет уведомление в группу
@@ -552,7 +547,6 @@ async def accept_tasks(callback: types.CallbackQuery):
     Args:
         callback (types.CallbackQuery): полученная функция обратного вызова
     """
-
     await bot.edit_message_reply_markup(
         chat_id=callback.from_user.id,
         message_id=callback.message.message_id,
@@ -569,8 +563,8 @@ async def accept_tasks(callback: types.CallbackQuery):
 
     for task in my_tasks:
         task_modify = CobraTaskEdit(cobra_config)
-        task_modify.accept_one_task(task['n_abs'])
-        task_modify.update_one_task_time(task['n_abs'], current_datetime)
+        task_modify.accept_one_task(task["n_abs"])
+        task_modify.update_one_task_time(task["n_abs"], current_datetime)
 
     for chat in tg_config.get_task_full_report_chat_ids():
         await bot.send_message(
@@ -588,4 +582,6 @@ def register_handlers_event(dp: Dispatcher):
     """
     dp.register_message_handler(cmd_tasks_notify, commands="tasks", state="*")
     dp.register_message_handler(cmd_my_tasks, commands="my_tasks", state="*")
-    dp.register_message_handler(cmd_close_task, state=CloseMyTaskDialog.waiting_input_reason)
+    dp.register_message_handler(
+        cmd_close_task, state=CloseMyTaskDialog.waiting_input_reason
+    )

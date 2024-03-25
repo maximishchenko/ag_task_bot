@@ -4,10 +4,17 @@
 Хранит базовые объекты, отвечающие за идентификацию стадии диалога.
 """
 
-from aiogram.dispatcher.filters.state import State, StatesGroup
+# Standard Library
 from enum import Enum
 
+from aiogram.dispatcher.filters.state import State, StatesGroup
+
+
 class TaskParam(Enum):
+    """Параметры заявки.
+
+    Параметры абстрактной заявки, используемые в диалоге.
+    """
 
     task_id = "task_id"
     reason_for_close = "reason_for_close"
@@ -47,5 +54,6 @@ class MyTask(StatesGroup):
 
 
 class CloseMyTaskDialog(StatesGroup):
+    """Набор состояний для реклизации диалога закрытия заявки."""
 
     waiting_input_reason = State()

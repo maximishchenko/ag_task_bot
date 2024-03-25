@@ -4,14 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-requests = "*"
 openpyxl = "*"
-types-requests = "*"
-types-openpyxl = "*"
 aiogram = "==2.25.1"
 aiocron = "*"
 aiogram-datepicker = "*"
 aiogram-timepicker = "*"
+requests = "*"
 
 [dev-packages]
 mypy = "*"
@@ -24,6 +22,8 @@ flake8-print = "*"
 flake8-comprehensions = "*"
 flake8-docstrings = "*"
 flake8-requirements = "*"
+types-requests = "*"
+types-openpyxl = "*"
 
 [requires]
 python_version = "3.10"

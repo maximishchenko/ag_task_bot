@@ -16,7 +16,7 @@ from app.handlers.event import register_handlers_event  # noqa
 from app.handlers.signup import register_handlers_signup  # noqa
 
 
-async def set_commands(bot: Bot):
+async def set_commands(bot: Bot) -> None:
     """
     Установка команд бота.
 
@@ -32,7 +32,7 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 
-async def shutdown(dispatcher: Dispatcher):
+async def shutdown(dispatcher: Dispatcher) -> None:
     """
     Действие при завершении.
 
@@ -45,7 +45,7 @@ async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.wait_closed()
 
 
-async def startup(dispatcher: Dispatcher):
+async def startup(dispatcher: Dispatcher) -> None:
     """
 
     Действие перед запуском.

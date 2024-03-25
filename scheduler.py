@@ -5,6 +5,7 @@
 приложения. Запуск возможен через systemd или supervisor
 """
 
+# Standard Library
 import asyncio
 
 import aiocron
@@ -13,7 +14,7 @@ from app.bot_global import tg_config
 from tasks_notify import send_all_tasks, send_personal_tasks
 
 
-async def main():
+async def main() -> None:
     """
     Реализация планировщика заданий.
 

@@ -4,6 +4,7 @@
 Отправляет общую информацию в группу и персональные уведомления
 """
 
+# Standard Library
 import asyncio
 import shutil
 from itertools import groupby

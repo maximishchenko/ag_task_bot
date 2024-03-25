@@ -1,20 +1,23 @@
-from abc import ABC
+"""Управление конфигурацией взаимодействия с разными источниками данных."""
+
+# Standard Library
 import configparser
+from abc import ABC
 
 
 class Config(ABC):
-    """Базовый класс для реализации методов получения параметров"""
+    """Базовый класс для реализации методов получения параметров."""
 
     default_encoding = "utf-8"
     """ Кодировка файла конфигурации """
 
-    def __init__(self, config_file_path: str = "config/config.ini") -> None:
+    def __init__(self, config_file_path: str) -> None:  # noqa D107
         self.config = configparser.ConfigParser()
         self.config.read(config_file_path, encoding=self.default_encoding)
 
 
 class CobraConfig(Config):
-    """Получение параметров, отвечающих за подключение к КПО Кобра"""
+    """Получение параметров, отвечающих за подключение к КПО Кобра."""
 
     section = "Cobra"
     """ Название секции файла конфигурации """
@@ -31,33 +34,35 @@ class CobraConfig(Config):
     к КПО Кобра """
 
     def get_host(self) -> str:
-        """Возвращает адрес хоста или FQDN-имя сервера КПО Кобра"""
+        """Возвращает адрес хоста или FQDN-имя сервера КПО Кобра."""
         return self.config.get(self.section, self.host_param)
 
     def get_port(self) -> str:
-        """Возвращает порт для подключения к КПО Кобра"""
+        """Возвращает порт для подключения к КПО Кобра."""
         return self.config.get(self.section, self.port_param)
 
     def get_token(self) -> str:
-        """Возвращает пароль удаленного доступа pud для подключения к
-        КПО Кобра"""
+        """Возвращает пароль удаленного доступа pud.
+
+        Используется для подключения к КПО Кобра.
+        """
         return self.config.get(self.section, self.token_param)
 
 
 class TelegramConfig(Config):
-    """Получение параметров, отвечающих за взаимодействие с Telegram API"""
+    """Получение параметров, отвечающих за взаимодействие с Telegram API."""
 
     section = "Telegram"
-    """ Название секции файла конфигурации """
+    """ Название секции файла конфигурации. """
 
     token_param = "token"
-    """ Имя параметра, хранящего данные токена бота """
+    """ Имя параметра, хранящего данные токена бота. """
 
     task_full_report_chat_ids = "task_full_report_chat_ids"
-    """ Имя параметра, хранящего данные с ID чата в Telegram """
+    """ Имя параметра, хранящего данные с ID чата в Telegram. """
 
     admin_chat_ids_param = "admin_chat_ids"
-    """ Имя параметра, хранящего данные ID чатов администраторов в Telegram """
+    """ Имя параметра, хранящего данные ID чатов администраторов в Telegram. """
 
     task_full_report_time = "task_full_report_time"
     """ Имя параметра, хранящего время запуска генерации отчета для отправки
@@ -68,29 +73,34 @@ class TelegramConfig(Config):
     перснальных уведомлений """
 
     def get_token(self) -> str:
-        """Возвращает токен бота Telegram"""
+        """Возвращает токен бота Telegram."""
         return self.config.get(self.section, self.token_param)
 
     def get_task_full_report_chat_ids(self) -> tuple:
-        """Возвращает ID чата в Telegram для отправки уведомлений"""
+        """Возвращает ID чата в Telegram для отправки уведомлений."""
         task_chat_ids = self.task_full_report_chat_ids
         chat_ids = self.config.get(self.section, task_chat_ids)
         return tuple(chat_ids.split(","))
 
     def get_task_full_report_shedule_time(self) -> tuple:
-        """Возвращает время запуска генерации отчета для отправки в группу"""
+        """Возвращает время запуска генерации отчета для отправки в группу."""
         sch_time = self.config.get(self.section, self.task_full_report_time)
         return tuple(sch_time.split(":"))
 
     def get_task_personal_report_shedule_time(self) -> tuple:
-        """Возвращает время запуска генерации отчета для отправки персональных
-        уведомлений"""
+        """Возвращает время запуска генерации отчета.
+
+        Используется для отправки персональных уведомлений.
+
+        Returns:
+            tuple: кортеж, содержащий время запуска генерации отчета.
+        """
         report_time = self.task_personal_report_time
         sch_time = self.config.get(self.section, report_time)
         return tuple(sch_time.split(":"))
 
     def get_admin_chat_ids(self) -> tuple:
-        """Возвращает ID чатов администраторов бота в Telegram
+        """Возвращает ID чатов администраторов бота в Telegram.
 
         Returns:
             tuple: кортеж, содержащий ID чатов администраторов в Telegram

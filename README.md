@@ -54,3 +54,8 @@ python tasks_notify.py
 ```
 python bot.py
 ```
+
+* Ручной запуск проверок pre-commit
+```
+pipenv run pre-commit run -a
+```

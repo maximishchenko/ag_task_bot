@@ -1,10 +1,18 @@
-import openpyxl
+"""Генерация отчетов.
+
+Логика генерации отчетов. В формате текстовых сообщений Telegram и Excel.
+"""
+
+# Standard Library
 import string
 from abc import ABC
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import openpyxl
+from openpyxl.styles import Alignment, Font
 from openpyxl.styles.borders import Border, Side
-from openpyxl.styles import Font, Alignment
+
 from app.service.cobra import TaskReportHeader
 
 
@@ -17,38 +25,37 @@ class ExcelReport(ABC):
     file_suffix = "xlsx"
     """ Расширение экспортируемого файла """
 
-    def __init__(self) -> None:
+    def __init__(self) -> None:  # noqa D107
         self._workbook = openpyxl.Workbook()
         self._sheet = self._workbook.active
         self._columns = string.ascii_uppercase
+        self.file_name = ""
 
     def save(self):
-        """Сохраняет экспортирвуемый файл"""
+        """Сохраняет экспортирвуемый файл."""
         self.export_filename = self._set_file_name()
         self._workbook.save(self.export_filename)
 
     def _set_file_name(self) -> Path:
-        """Генерация пути к файлу экспорта
-        Имя файла экспорта должно задаваться атрибутом file_name в
-        классе-потомке"""
+        """Генерация пути к файлу экспорта.
+
+        Имя файла экспорта задается атрибутом file_name в классе-потомке.
+        """
         self._create_export_path_if_not_exists()
         current_datetime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        return Path(
-            self.export_path
-            + current_datetime
-            + "_"
-            + self.file_name
-            + "."
-            + self.file_suffix
+        file_path = Path(
+            f"{self.export_path}{current_datetime}_\
+{self.file_name}.{self.file_suffix}"
         )
+        return file_path
 
     def _create_export_path_if_not_exists(self):
-        """Создает каталог экспорта в случае его отсутствия"""
+        """Создает каталог экспорта в случае его отсутствия."""
         Path(self.export_path).mkdir(parents=True, exist_ok=True)
 
 
 class CobraTaskExcelReport(ExcelReport):
-    """Реализация отчета, содержащего данные открытых заявок"""
+    """Реализация отчета, содержащего данные открытых заявок."""
 
     file_name = "Аварийные_заявки"
     """ Имя генерируемого файла без расширения """
@@ -59,6 +66,7 @@ class CobraTaskExcelReport(ExcelReport):
     start_row = 3
 
     def set_header(self):
+        """Устанавливает заголовок таблицы отчета в формате Excel."""
         current_date = datetime.today().strftime("%d.%m.%Y")
         self._sheet.merge_cells("A1:H1")
         self._sheet["A1"] = f"Аварийные Заявки {current_date}"
@@ -67,6 +75,7 @@ class CobraTaskExcelReport(ExcelReport):
         self._sheet["A1"].alignment = Alignment(horizontal="center")
 
     def set_footer(self):
+        """Устанавливает дисклеймер отчета в формате Excel."""
         current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         self._sheet.merge_cells(
             "A" + str(self.max_row + 1) + ":H" + str(self.max_row + 1)
@@ -75,7 +84,8 @@ class CobraTaskExcelReport(ExcelReport):
             f"Дата формирования отчета: {current_datetime}"
         )
 
-    def set_row(self, task: dict):
+    def set_row(self, task: dict) -> None:
+        """Устанавливает данные строки отчета."""
         if self.max_row == self.start_row:
             self._sheet["A" + str(self.max_row)] = TaskReportHeader().timez
             self._sheet["B" + str(self.max_row)] = TaskReportHeader().timev
@@ -87,9 +97,9 @@ class CobraTaskExcelReport(ExcelReport):
             self._sheet["H" + str(self.max_row)] = TaskReportHeader().tehn
             self._set_row_border(self.max_row)
             self._set_font_bold(self.max_row)
-            self._add_row_by_number(task, str(self.max_row + 1))
-            self._set_row_border(str(self.max_row + 1))
-            self._set_text_alignment(str(self.max_row + 1), True)
+            self._add_row_by_number(task, self.max_row + 1)
+            self._set_row_border(self.max_row + 1)
+            self._set_text_alignment(self.max_row + 1, True)
         else:
             self._add_row_by_number(task, self.max_row)
             self._set_row_border(self.max_row)
