@@ -19,7 +19,7 @@ from app.service.cobra import TaskReportHeader
 class ExcelReport(ABC):
     """Базовый класс для генерации отчетов КПО Кобра."""
 
-    export_path = "out/"
+    export_path = "job/"
     """ Каталог экспорта файлов относительно каталога текущего проекта """
 
     file_suffix = "xlsx"
@@ -29,7 +29,6 @@ class ExcelReport(ABC):
         self._workbook = openpyxl.Workbook()
         self._sheet = self._workbook.active
         self._columns = string.ascii_uppercase
-        self.file_name = ""
 
     def save(self):
         """Сохраняет экспортирвуемый файл."""
@@ -41,17 +40,17 @@ class ExcelReport(ABC):
 
         Имя файла экспорта задается атрибутом file_name в классе-потомке.
         """
-        self._create_export_path_if_not_exists()
+        # self._create_export_path_if_not_exists()
         current_datetime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         file_path = Path(
             f"{self.export_path}{current_datetime}_\
-{self.file_name}.{self.file_suffix}"
+{self.file_name}.{self.file_suffix}"  # type: ignore
         )
         return file_path
 
-    def _create_export_path_if_not_exists(self):
+        # def _create_export_path_if_not_exists(self):
         """Создает каталог экспорта в случае его отсутствия."""
-        Path(self.export_path).mkdir(parents=True, exist_ok=True)
+        # Path(self.export_path).mkdir(parents=True, exist_ok=True)
 
 
 class CobraTaskExcelReport(ExcelReport):

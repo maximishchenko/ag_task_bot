@@ -6,7 +6,8 @@
 
 # Standard Library
 import asyncio
-import shutil
+
+# import shutil
 from itertools import groupby
 
 from aiogram import types
@@ -66,11 +67,11 @@ async def send_all_tasks():
                 chat, "Заявки на текущую дату отсутствуют", parse_mode="html"
             )
 
-    # Очистка каталог экспорта отчетов
-    shutil.rmtree(
-        CobraTaskExcelReport.export_path,
-        ignore_errors=True,
-    )
+    # # Очистка каталог экспорта отчетов
+    # shutil.rmtree(
+    #     CobraTaskExcelReport.export_path,
+    #     ignore_errors=True,
+    # )
 
 
 async def send_personal_tasks():

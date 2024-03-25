@@ -9,7 +9,6 @@ from datetime import datetime
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-from aiogram_datepicker import DatepickerSettings
 
 from app.bot_global import bot, cobra_config, cobra_tasks, dp, logger, tg_config, user
 from app.handlers.state import CloseMyTaskDialog, TaskParam
@@ -64,72 +63,6 @@ def get_task_action_params(data: str) -> tuple:
     cobra_task_id = params[1]
     chat_id = params[2]
     return cobra_task_id, chat_id
-
-
-def get_datepicker_settings() -> DatepickerSettings:
-    """
-    Возвращает настройки виджета календаря.
-
-    Returns:
-        DatepickerSettings: Параметры виджета календаря.
-    """
-    return DatepickerSettings(
-        initial_view="day",  # available views -> day, month, year
-        initial_date=datetime.now().date(),  # default date
-        views={
-            "day": {
-                "show_weekdays": True,
-                "weekdays_labels": ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
-                "header": ["prev-year", "days-title", "next-year"],
-                "footer": [
-                    "prev-month",
-                    "select",
-                    "next-month",
-                ],
-            },
-            "month": {
-                "months_labels": [
-                    "Янв",
-                    "Фев",
-                    "Март",
-                    "Апр",
-                    "Май",
-                    "Июнь",
-                    "Июль",
-                    "Авг",
-                    "Сен",
-                    "Окт",
-                    "Ноя",
-                    "Дек",
-                ],
-                "header": [
-                    "prev-year",
-                    ["year", "select"],
-                    "next-year",
-                ],
-                "footer": ["select"],
-            },
-            "year": {
-                "header": [],
-                "footer": ["prev-years", "next-years"],
-            },
-        },
-        labels={
-            "prev-year": "<<",
-            "next-year": ">>",
-            "prev-years": "<<",
-            "next-years": ">>",
-            "days-title": "{month} {year}",
-            "selected-day": "{day} *",
-            "selected-month": "{month} *",
-            "present-day": "• {day} •",
-            "prev-month": "<",
-            "select": "Выбрать",
-            "next-month": ">",
-            "ignore": "",
-        },
-        custom_actions=[],  # some custom actions
-    )
 
 
 def get_close_task_buttons() -> types.InlineKeyboardMarkup:
