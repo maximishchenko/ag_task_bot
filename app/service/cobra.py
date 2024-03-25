@@ -109,7 +109,6 @@ class CobraTaskReport(CobraTable):
         params = {
             "name": self.table_name,
             "filter": '[{"n_abs": "' + n_abs + '"}]',
-            # "fields": self._get_fields(),
         }
         response = requests.get(url=url, params=params).json()
         return (response["result"][0],)
@@ -120,7 +119,6 @@ class CobraTaskReport(CobraTable):
         params = {
             "name": self.table_name,
             "filter": self._get_filter(),
-            # "fields": self._get_fields(),
         }
         response = requests.get(url=url, params=params).json()
         result = sorted(response["result"], key=lambda task: task["tehn"])

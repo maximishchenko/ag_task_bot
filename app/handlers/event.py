@@ -9,11 +9,10 @@ from datetime import datetime
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-from aiogram_datepicker import Datepicker, DatepickerSettings
-from aiogram_timepicker.panel import FullTimePicker, full_timep_callback
+from aiogram_datepicker import DatepickerSettings
 
 from app.bot_global import bot, cobra_config, cobra_tasks, dp, logger, tg_config, user
-from app.handlers.state import CloseMyTaskDialog, MyTask, TaskParam
+from app.handlers.state import CloseMyTaskDialog, TaskParam
 from app.service.cobra import CobraTaskEdit, CobraTaskReportMessage
 from tasks_notify import send_all_tasks, send_personal_tasks
 
@@ -303,10 +302,6 @@ async def task_actions(callback: types.CallbackQuery):
                 text="Просмотр заявки",
                 callback_data=f"view_act|{cobra_task_id}|{chat_id}",
             ),
-            # types.InlineKeyboardButton(
-            #     text="Перенос заявки",
-            #     callback_data=f"change_act|{cobra_task_id}|{chat_id}",
-            # ),
         ],
         [
             types.InlineKeyboardButton(
@@ -344,99 +339,6 @@ async def view_task_action(callback: types.CallbackQuery):
         report_message.add_generation_datetime()
         text = report_message.get_report_message_text()
         await bot.send_message(chat_id, text, parse_mode="html")
-
-
-@dp.callback_query_handler(lambda c: c.data.startswith("change_act"))
-async def change_date_action(callback: types.CallbackQuery, state: FSMContext):
-    """
-    Перенос даты заявки.
-
-    Позволяет запустить процесс изменяющий дату исполнения заявки в КПО Кобра.
-
-    Args:
-        callback (types.CallbackQuery): полученная функция обратного вызова
-    """
-    cobra_task_id, chat_id = get_task_action_params(callback.data)
-    await bot.delete_message(
-        chat_id=callback.from_user.id, message_id=callback.message.message_id
-    )
-    datepicker = Datepicker(get_datepicker_settings())
-    markup = datepicker.start_calendar()
-    async with state.proxy() as data:
-        data[MyTask.task_id_param] = cobra_task_id
-    await callback.message.answer(
-        "Выберите дату переноса заявки: ", reply_markup=markup
-    )
-
-
-@dp.callback_query_handler(Datepicker.datepicker_callback.filter())
-async def process_datepicker(
-    callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext
-):
-    """
-    Обрабатывает выбор даты в календаре.
-
-    Принимает данные (дата переноса заявки) от виджета DatePicker.
-    Запрашивает время, на которое будет перенесена заявка.
-    Направляет запрос в КПО Кобра
-
-    Args:
-        callback_query (types.CallbackQuery): _description_
-        callback_data (dict): _description_
-        state (FSMContext): _description_
-    """
-    datepicker = Datepicker(get_datepicker_settings())
-
-    date = await datepicker.process(callback_query, callback_data)
-    if date:
-        async with state.proxy() as data:
-            data[MyTask.task_new_date_param] = date.strftime("%d.%m.%Y")
-        await bot.delete_message(
-            chat_id=callback_query.from_user.id,
-            message_id=callback_query.message.message_id,
-        )
-
-        await callback_query.message.answer(
-            "Выберите время переноса заявки: ",
-            reply_markup=await FullTimePicker().start_picker(),
-        )
-    await callback_query.answer()
-
-
-@dp.callback_query_handler(full_timep_callback.filter())
-async def process_full_timepicker(
-    callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext
-):
-    """
-    Обрабатывает данные, полученные от виджета TimePicker.
-
-    Направляет информацию о дате переноса заявки в КПО Кобра.
-    Устанавливает метку принятия заявки техником при необходимости
-
-    Args:
-        callback_query (types.CallbackQuery): _description_
-        callback_data (dict): _description_
-        state (FSMContext): _description_
-    """
-    r = await FullTimePicker().process_selection(callback_query, callback_data)
-    if r.selected:
-        task_new_param = await state.get_data()
-        task_id = task_new_param[MyTask.task_id_param]
-        task_time = r.time.strftime("%H:%M:%S")
-        task_date = task_new_param[MyTask.task_new_date_param]
-        async with state.proxy() as data:
-            data[MyTask.task_new_time_param] = task_time
-
-        task_modify = CobraTaskEdit(cobra_config)
-        task_n_abs = task_new_param[MyTask.task_id_param]
-        task_new_datetime = f"{task_date} {task_time}"
-        task_modify.accept_one_task(task_n_abs)
-        task_modify.update_one_task_time(task_n_abs, task_new_datetime)
-        await callback_query.message.answer(
-            f"Заявка №{task_id}. Перенесена на {task_date} {task_time}",
-            # reply_markup=start_kb
-        )
-        await callback_query.message.delete_reply_markup()
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("close_action"))
