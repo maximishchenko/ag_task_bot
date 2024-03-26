@@ -101,7 +101,7 @@ async def send_personal_tasks():
                     [
                         types.InlineKeyboardButton(
                             text="Корректировка ответственных лиц",
-                            callback_data=f"responsibility_action|{task['tehn']}",
+                            callback_data=f"responsibility_act|{task['tehn']}",
                         ),
                     ],
                 ]

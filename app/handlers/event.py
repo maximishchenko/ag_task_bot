@@ -4,6 +4,7 @@
 Взаимодействие с модулями КПО Кобра.
 """
 
+# TODO разделить на зоны ответственности: заявки техника, ответственные лица
 # Standard Library
 from datetime import datetime
 
@@ -403,10 +404,22 @@ async def accept_tasks(callback: types.CallbackQuery):
         )
 
 
-# @dp.callback_query_handler(lambda c: c.data.startwith("responsibility_action"))
-# async def change_responsibility_persons(callback: types.CallbackQuery):
-#     # TODO добавить реализацию.
-#     pass
+@dp.callback_query_handler(lambda c: c.data.startswith("responsibility_act"))
+async def get_resp_persons(callback: types.CallbackQuery, state: FSMContext):
+    """Действие, производимое при запросе корректировки заявок.
+
+    Возвращает inline-клавиатуру со списком текущих аварийных заявок.
+
+    Args:
+        callback (types.CallbackQuery): переданная функция обратного вызова
+        state (FSMContext): текущее состояние диалога
+    """
+    await callback.message.answer(
+        "Выберите заявку, для которой производится \
+корректировка данных ответственного лица. Внимание, будут предложены только \
+те объекты, которые присутствуют в списке аварийных заявок на текущий момент"
+    )
+    return
 
 
 def register_handlers_event(dp: Dispatcher):
