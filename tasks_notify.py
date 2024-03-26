@@ -101,12 +101,12 @@ async def send_personal_tasks():
                             callback_data=f"accept_action|{task['tehn']}",
                         ),
                     ],
-                    [
-                        types.InlineKeyboardButton(
-                            text="Корректировка ответственных лиц",
-                            callback_data=f"responsibility_act|{task['tehn']}",
-                        ),
-                    ],
+                    # [
+                    #     types.InlineKeyboardButton(
+                    #         text="Корректировка ответственных лиц",
+                    #         callback_data=f"responsibility_act|{task['tehn']}",
+                    #     ),
+                    # ],
                 ]
                 accept_kb = types.InlineKeyboardMarkup(inline_keyboard=kb)
                 await bot.send_message(
