@@ -35,7 +35,7 @@ async def cmd_signup(message: types.Message, state: FSMContext):
     await state.finish()
     if message.chat.type != types.ChatType.PRIVATE:
         await message.answer(
-            "Регастрация не доступна в группе. \
+            "Регистрация недоступна в группе. \
 Регистрация возможна только в прямом диалоге с ботом"
         )
         await state.finish()
