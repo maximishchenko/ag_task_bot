@@ -2,3 +2,4 @@
 .mypy_cache/
 out/
 db.sqlite3
+.vscode/

@@ -6,6 +6,7 @@
 # Standard Library
 import sqlite3
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -78,7 +79,7 @@ class User(DB):
 (?, ?, ?, ?, ?, ?)"
             return self._cursor.execute(query_str, params)
 
-    def get_user(self, chat_id: int) -> OneUser | None:
+    def get_user(self, chat_id: int) -> Optional[OneUser]:
         """Возвращает данные техника по Telegram chat id.
 
         Args:

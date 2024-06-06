@@ -43,7 +43,7 @@ def is_private_chat(message: types.Message) -> bool:
     """
     return message.chat.type == types.ChatType.PRIVATE and user.get_user(
         message.from_user.id
-    )
+    ) is not None
 
 
 def get_task_action_params(data: str) -> tuple:
@@ -79,19 +79,19 @@ def get_close_task_buttons() -> types.InlineKeyboardMarkup:
             types.InlineKeyboardButton(
                 text="Подтвердить",
                 callback_data="closing_act_accept",
-            ),
+            ), # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Корректировать текст результата",
                 callback_data="closing_act_edit",
-            ),
+            ), # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Отмена",
                 callback_data="closing_act_cancel",
-            ),
+            ), # type: ignore
         ],
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
@@ -157,15 +157,14 @@ async def cmd_my_tasks(message: types.Message, state: FSMContext):
             for task in my_tasks:
                 callback_data = f"task|{task['n_abs']}|{message.from_user.id}"
                 btns.append(
-                    types.InlineKeyboardButton(
-                        text=task["n_abs"],
+                    [types.InlineKeyboardButton(
+                        text=f"{task['numobj']} (№ {task['n_abs']} от {task['timez']})", #task["n_abs"]
                         callback_data=callback_data,
-                    ),
+                    ),] # type: ignore
                 )
-            my_tasks_kb = types.InlineKeyboardMarkup(inline_keyboard=[btns])
+            my_tasks_kb = types.InlineKeyboardMarkup(inline_keyboard=btns)
             await message.answer(
-                "Выберите заявку из предложенного списка. \
-Текст кнопки - номер заявки в КПО Кобра",
+                "Выберите заявку из предложенного списка.",
                 reply_markup=my_tasks_kb,
             )
         else:
@@ -235,13 +234,13 @@ async def task_actions(callback: types.CallbackQuery):
             types.InlineKeyboardButton(
                 text="Просмотр заявки",
                 callback_data=f"view_act|{cobra_task_id}|{chat_id}",
-            ),
+            ), # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Закрыть заявку",
                 callback_data=f"close_action|{cobra_task_id}|{chat_id}",
-            ),
+            ), # type: ignore
         ],
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
@@ -350,6 +349,11 @@ async def accept_closing_task(callback: types.CallbackQuery, state: FSMContext):
     cobra_task_id = task_param[TaskParam.task_id.value]
     task_closing_reason = task_param[TaskParam.reason_for_close.value]
     my_user = user.get_user(callback.message.chat.id)
+    if not my_user:
+        error_msg = "Не найден пользователь в БД для подтверждения закрытия \
+заявки"
+        logger.error(error_msg)
+        return
     msg = f"Заявка {cobra_task_id} закрыта. Техник: {my_user.tehn} \
 Результат: {task_closing_reason}"
 
