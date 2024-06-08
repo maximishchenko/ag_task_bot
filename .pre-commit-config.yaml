@@ -43,3 +43,13 @@ repos:
     rev: v0.910
     hooks:
     - id: mypy
+-   repo: local
+    hooks:
+    -   id: run-tests
+        name: Run tests
+        description: Runs unittest discover to run Python based unit tests
+        types: [python]
+        language: system
+        pass_filenames: false
+        entry: python -m unittest discover -qb
+        stages: [commit]

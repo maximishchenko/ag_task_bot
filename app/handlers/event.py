@@ -4,7 +4,6 @@
 Взаимодействие с модулями КПО Кобра.
 """
 
-# TODO разделить на зоны ответственности: заявки техника, ответственные лица
 # Standard Library
 from datetime import datetime
 
@@ -41,9 +40,10 @@ def is_private_chat(message: types.Message) -> bool:
     Returns:
         bool: результат проверки
     """
-    return message.chat.type == types.ChatType.PRIVATE and user.get_user(
-        message.from_user.id
-    ) is not None
+    return (
+        message.chat.type == types.ChatType.PRIVATE
+        and user.get_user(message.from_user.id) is not None
+    )
 
 
 def get_task_action_params(data: str) -> tuple:
@@ -79,19 +79,19 @@ def get_close_task_buttons() -> types.InlineKeyboardMarkup:
             types.InlineKeyboardButton(
                 text="Подтвердить",
                 callback_data="closing_act_accept",
-            ), # type: ignore
+            ),  # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Корректировать текст результата",
                 callback_data="closing_act_edit",
-            ), # type: ignore
+            ),  # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Отмена",
                 callback_data="closing_act_cancel",
-            ), # type: ignore
+            ),  # type: ignore
         ],
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
@@ -123,7 +123,7 @@ async def cmd_tasks_notify(message: types.Message, state: FSMContext):
             )
             return
         await message.answer(pre_msg)
-        await send_all_tasks()
+        await send_all_tasks()  # type: ignore
     else:
         logger.warning(
             "Генерация отчета запрошена пользователем, \
@@ -157,10 +157,12 @@ async def cmd_my_tasks(message: types.Message, state: FSMContext):
             for task in my_tasks:
                 callback_data = f"task|{task['n_abs']}|{message.from_user.id}"
                 btns.append(
-                    [types.InlineKeyboardButton(
-                        text=f"{task['numobj']} (№ {task['n_abs']} от {task['timez']})", #task["n_abs"]
-                        callback_data=callback_data,
-                    ),] # type: ignore
+                    [
+                        types.InlineKeyboardButton(
+                            text=f"{task['numobj']} (№ {task['n_abs']} от {task['timez']})",
+                            callback_data=callback_data,
+                        ),
+                    ]  # type: ignore
                 )
             my_tasks_kb = types.InlineKeyboardMarkup(inline_keyboard=btns)
             await message.answer(
@@ -234,13 +236,13 @@ async def task_actions(callback: types.CallbackQuery):
             types.InlineKeyboardButton(
                 text="Просмотр заявки",
                 callback_data=f"view_act|{cobra_task_id}|{chat_id}",
-            ), # type: ignore
+            ),  # type: ignore
         ],
         [
             types.InlineKeyboardButton(
                 text="Закрыть заявку",
                 callback_data=f"close_action|{cobra_task_id}|{chat_id}",
-            ), # type: ignore
+            ),  # type: ignore
         ],
     ]
     my_actions_kb = types.InlineKeyboardMarkup(inline_keyboard=my_actions_btns)
@@ -364,6 +366,10 @@ async def accept_closing_task(callback: types.CallbackQuery, state: FSMContext):
     await state.finish()
     await callback.message.answer(msg)
     await callback.answer("Заявка закрыта")
+
+    await bot.delete_message(
+        chat_id=callback.from_user.id, message_id=callback.message.message_id
+    )
     for chat in tg_config.get_task_full_report_chat_ids():
         await bot.send_message(
             chat,

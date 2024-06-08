@@ -75,7 +75,7 @@ class CobraTaskReport(CobraTable):
         current_date = datetime.today().date()
         for task in response:
             timev = datetime.strptime(task["timev"], "%d.%m.%Y %H:%M:%S")
-            if current_date >= timev.date():
+            if current_date >= timev.date() and task["sttech"] != 3:
                 tasks_list.append(task)
         return tuple(tasks_list)
 
@@ -91,7 +91,7 @@ class CobraTaskReport(CobraTable):
         response = self._get_unfinished_tasks()
         tasks_list = []
         for task in response:
-            if task["tehn"] == name:
+            if task["tehn"] == name and task["sttech"] != 3:
                 tasks_list.append(task)
         return tuple(tasks_list)
 
@@ -136,7 +136,7 @@ class CobraTaskReport(CobraTable):
         """
         fields_value = '[{"n_abs": "1"}, {"zay": "1"}, {"prin": "1"}, \
 {"timez": "1"}, {"nameobj": "1"}, {"numobj": "1"}, {"addrobj": "1"}, \
-{"tehn": "1"}, {"timev": "1"}, {"who": 1}]'
+{"tehn": "1"}, {"timev": "1"}, {"who": 1}, {"sttech": 1}]'
         return f"{fields_value}"
 
 

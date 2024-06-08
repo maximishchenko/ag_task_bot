@@ -72,6 +72,10 @@ class TelegramConfig(Config):
     """ Имя параметра, хранящего время запуска генерации отчета для отправки
     перснальных уведомлений """
 
+    task_personal_notification_time = "task_personal_notification_time"
+    """Имя параметра, хранящего время запуска генерации персональных
+    напоминаний о незавершенных заявках в конце рабочей смены """
+
     def get_token(self) -> str:
         """Возвращает токен бота Telegram."""
         return self.config.get(self.section, self.token_param)
@@ -82,12 +86,12 @@ class TelegramConfig(Config):
         chat_ids = self.config.get(self.section, task_chat_ids)
         return tuple(chat_ids.split(","))
 
-    def get_task_full_report_shedule_time(self) -> tuple:
+    def get_task_full_report_sсhedule_time(self) -> tuple:
         """Возвращает время запуска генерации отчета для отправки в группу."""
         sch_time = self.config.get(self.section, self.task_full_report_time)
         return tuple(sch_time.split(":"))
 
-    def get_task_personal_report_shedule_time(self) -> tuple:
+    def get_task_personal_report_sсhedule_time(self) -> tuple:
         """Возвращает время запуска генерации отчета.
 
         Используется для отправки персональных уведомлений.
@@ -98,6 +102,19 @@ class TelegramConfig(Config):
         report_time = self.task_personal_report_time
         sch_time = self.config.get(self.section, report_time)
         return tuple(sch_time.split(":"))
+
+    def get_task_personal_notification_sсhedule_time(self) -> tuple:
+        """Возвращает время запуска генерации персональных уведомлений.
+
+        Используется для отправки напоминаний о незавершенных к концу текущей
+        рабочей смены заданий
+
+        Returns:
+            tuple: кортеж, содержащий время каждого напоминания
+        """
+        notification_time = self.task_personal_notification_time
+        sch_time = self.config.get(self.section, notification_time)
+        return tuple(sch_time.split(","))
 
     def get_admin_chat_ids(self) -> tuple:
         """Возвращает ID чатов администраторов бота в Telegram.

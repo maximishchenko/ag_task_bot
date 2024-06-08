@@ -69,7 +69,7 @@ async def send_all_tasks():
             )
 
 
-async def send_personal_tasks():
+async def send_personal_tasks(is_acceptance=True):
     """
     Отправляет персональные уведомления.
 
@@ -94,27 +94,28 @@ async def send_personal_tasks():
                     report_message_personal.add_task_to_report_message(task)
                 report_message_personal.add_empty_string_to_report_message()
 
-                kb = [
-                    [
-                        types.InlineKeyboardButton(
-                            text="Ознакомлен",
-                            callback_data=f"accept_action|{task['tehn']}",
-                        ),
-                    ],
-                    # [
-                    #     types.InlineKeyboardButton(
-                    #         text="Корректировка ответственных лиц",
-                    #         callback_data=f"responsibility_act|{task['tehn']}",
-                    #     ),
-                    # ],
-                ]
-                accept_kb = types.InlineKeyboardMarkup(inline_keyboard=kb)
-                await bot.send_message(
-                    current_user.chat_id,
-                    report_message_personal.get_report_message_text(),
-                    parse_mode="html",
-                    reply_markup=accept_kb,
-                )
+                if is_acceptance:
+                    kb = [
+                        [
+                            types.InlineKeyboardButton(
+                                text="Ознакомлен",
+                                callback_data=f"accept_action|{task['tehn']}",
+                            ),  # type: ignore
+                        ],
+                    ]
+                    accept_kb = types.InlineKeyboardMarkup(inline_keyboard=kb)
+                    await bot.send_message(
+                        current_user.chat_id,
+                        report_message_personal.get_report_message_text(),
+                        parse_mode="html",
+                        reply_markup=accept_kb,
+                    )
+                else:
+                    await bot.send_message(
+                        current_user.chat_id,
+                        report_message_personal.get_report_message_text(),
+                        parse_mode="html",
+                    )
 
 
 if __name__ == "__main__":

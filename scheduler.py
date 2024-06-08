@@ -21,7 +21,7 @@ async def main() -> None:
     Направляет общие и персональные уведомления по времени, заданном в
     файле конфигурации настроек
     """
-    task_full_report_time = tg_config.get_task_full_report_shedule_time()
+    task_full_report_time = tg_config.get_task_full_report_sсhedule_time()
     task_full_report_min = task_full_report_time[1]
     task_full_report_hour = task_full_report_time[0]
     aiocron.crontab(
@@ -31,7 +31,7 @@ async def main() -> None:
         start=True,
     )
 
-    personal_report_time = tg_config.get_task_personal_report_shedule_time()
+    personal_report_time = tg_config.get_task_personal_report_sсhedule_time()
     task_personal_report_min = personal_report_time[1]
     task_personal_report_hour = personal_report_time[0]
     aiocron.crontab(
@@ -40,6 +40,20 @@ async def main() -> None:
         args=(),
         start=True,
     )
+
+    personal_notification_time = (
+        tg_config.get_task_personal_notification_sсhedule_time()
+    )
+    for notification_time in personal_notification_time:
+        personal_time = tuple(notification_time.split(":"))
+        personal_time_min = personal_time[1]
+        personal_time_hour = personal_time[0]
+        aiocron.crontab(
+            f"{personal_time_min} {personal_time_hour} * * *",
+            func=send_personal_tasks,
+            args=(False,),
+            start=True,
+        )
 
     while True:
         await asyncio.sleep(1)

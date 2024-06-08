@@ -25,6 +25,7 @@ flake8-docstrings = "*"
 flake8-requirements = "*"
 types-requests = "*"
 types-openpyxl = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.10"
